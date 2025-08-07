@@ -1,0 +1,1873 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Koreksi Jawaban Siswa</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px 8px;
+            text-align: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+        
+        .tab.active {
+            background: white;
+            color: #4facfe;
+            border-bottom: 3px solid #4facfe;
+        }
+        
+        .content {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .question-type {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .question-type h4 {
+            color: #495057;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .question-input {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            gap: 10px;
+        }
+        
+        .question-number {
+            min-width: 30px;
+            font-weight: 600;
+            color: #6c757d;
+        }
+        
+        .answer-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            flex: 1;
+        }
+        
+        .answer-btn {
+            padding: 8px 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            background: white;
+            color: #495057;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 40px;
+            font-size: 0.9rem;
+        }
+        
+        .answer-btn:hover {
+            border-color: #4facfe;
+            background: #f8f9ff;
+        }
+        
+        .answer-btn.active {
+            background: #4facfe;
+            color: white;
+            border-color: #4facfe;
+        }
+        
+        .answer-btn.multi.active {
+            background: #28a745;
+            border-color: #28a745;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .btn-primary {
+            background: #4facfe;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #3d8bfe;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .student-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4facfe;
+        }
+        
+        .student-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .answer-section {
+            margin-bottom: 20px;
+        }
+        
+        .answer-section h4 {
+            color: #495057;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .answer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .answer-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .answer-item span {
+            min-width: 25px;
+            font-weight: 600;
+            color: #6c757d;
+        }
+        
+        .answer-item input {
+            padding: 6px 8px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            width: 100%;
+        }
+        
+        .answer-item .button-group {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .score-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .score-display h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .score-breakdown {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .score-item {
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .grade-list {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .grade-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .grade-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .student-name {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .student-class {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        .grade-score {
+            text-align: right;
+        }
+        
+        .grade-score .score {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        
+        .grade-score .details {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .status-excellent { background: #28a745; }
+        .status-good { background: #17a2b8; }
+        .status-fair { background: #ffc107; }
+        .status-poor { background: #dc3545; }
+        
+        .exam-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .exam-info h3 {
+            margin-bottom: 10px;
+        }
+        
+        .exam-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @media print {
+            body { 
+                background: white; 
+                padding: 0;
+            }
+            .container { 
+                box-shadow: none; 
+                border-radius: 0;
+                max-width: none;
+            }
+            .tabs, .btn { 
+                display: none; 
+            }
+            .header {
+                background: #4facfe;
+                -webkit-print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 Koreksi Jawaban Siswa</h1>
+            <p>Ide kreatif: MAHFUD SIDIK</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('settings')">⚙️ Pengaturan</button>
+            <button class="tab" onclick="showTab('correction')">✏️ Koreksi</button>
+            <button class="tab" onclick="showTab('results')">📊 Hasil</button>
+        </div>
+        
+        <!-- Tab Pengaturan -->
+        <div id="settings" class="content">
+            <div class="form-group">
+                <label>📚 Nama Ujian</label>
+                <input type="text" id="examName" placeholder="Contoh: Ulangan Harian Matematika">
+            </div>
+            
+            <div class="form-group">
+                <label>🏫 Kelas</label>
+                <input type="text" id="examClass" placeholder="Contoh: XII IPA 1">
+            </div>
+            
+            <div class="form-group">
+                <label>📖 Mata Pelajaran</label>
+                <input type="text" id="subject" placeholder="Contoh: Matematika">
+            </div>
+            
+            <div class="form-group">
+                <label>📋 Materi</label>
+                <input type="text" id="material" placeholder="Contoh: Integral dan Diferensial">
+            </div>
+            
+            <h3 style="margin: 25px 0 15px 0; color: #495057;">🔑 Kunci Jawaban</h3>
+            
+            <div class="question-type">
+                <h4>📝 Pilihan Ganda</h4>
+                <div class="form-group">
+                    <label>Jumlah Soal</label>
+                    <input type="number" id="mcCount" value="10" min="0" max="50" onchange="generateAnswerInputs()">
+                </div>
+                <div id="mcAnswers"></div>
+            </div>
+            
+            <div class="question-type">
+                <h4>📋 Pilihan Ganda Kompleks</h4>
+                <div class="form-group">
+                    <label>Jumlah Soal</label>
+                    <input type="number" id="ccCount" value="5" min="0" max="20" onchange="generateAnswerInputs()">
+                </div>
+                <div id="ccAnswers"></div>
+            </div>
+            
+            <div class="question-type">
+                <h4>🔗 Menjodohkan</h4>
+                <div class="form-group">
+                    <label>Jumlah Soal</label>
+                    <input type="number" id="matchCount" value="5" min="0" max="20" onchange="generateAnswerInputs()">
+                </div>
+                <div id="matchAnswers"></div>
+            </div>
+            
+            <div class="question-type">
+                <h4>✍️ Isian Singkat</h4>
+                <div class="form-group">
+                    <label>Jumlah Soal</label>
+                    <input type="number" id="shortCount" value="5" min="0" max="20" onchange="generateAnswerInputs()">
+                </div>
+                <div id="shortAnswers"></div>
+            </div>
+            
+            <div class="question-type">
+                <h4>📄 Uraian</h4>
+                <div class="form-group">
+                    <label>Jumlah Soal</label>
+                    <input type="number" id="essayCount" value="3" min="0" max="10" onchange="generateAnswerInputs()">
+                </div>
+                <div id="essayAnswers"></div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="saveSettings()">💾 Simpan Pengaturan</button>
+            <button class="btn btn-warning" onclick="loadSettings()">📂 Muat Data Tersimpan</button>
+        </div>
+        
+        <!-- Tab Koreksi -->
+        <div id="correction" class="content hidden">
+            <div id="examInfoDisplay" class="exam-info" style="display: none;"></div>
+            
+            <div class="student-card">
+                <h3 style="margin-bottom: 15px; color: #495057;">👤 Identitas Siswa</h3>
+                <div class="student-info">
+                    <div class="form-group">
+                        <label>Nama Lengkap</label>
+                        <input type="text" id="studentName" placeholder="Nama siswa">
+                    </div>
+                    <div class="form-group">
+                        <label>Kelas</label>
+                        <input type="text" id="studentClass" placeholder="Kelas siswa">
+                    </div>
+                </div>
+            </div>
+            
+            <div id="liveScoreDisplay" class="score-display" style="display: none;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: center;">
+                    <div>
+                        <h3 style="margin: 0; font-size: 1.2rem;">Skor</h3>
+                        <div style="font-size: 1.8rem; font-weight: bold; margin-top: 5px;" id="liveTotalScore">0/0</div>
+                    </div>
+                    <div>
+                        <h3 style="margin: 0; font-size: 1.2rem;">Nilai</h3>
+                        <div style="font-size: 1.8rem; font-weight: bold; margin-top: 5px;" id="livePercentage">0%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="answerSections"></div>
+            
+            <button class="btn btn-primary" onclick="checkAnswers()">💾 Simpan</button>
+            <button class="btn btn-warning" onclick="resetAnswers()">🔄 Reset</button>
+        </div>
+        
+        <!-- Tab Hasil -->
+        <div id="results" class="content hidden">
+            <div id="examInfoResult" class="exam-info" style="display: none;"></div>
+            
+            <div class="grade-list" id="gradeList">
+                <h3 style="margin-bottom: 15px; color: #495057;">📊 Daftar Nilai</h3>
+                <div style="text-align: center; color: #6c757d; padding: 20px;">
+                    Belum ada data nilai
+                </div>
+            </div>
+            
+            <button class="btn btn-success" onclick="exportToPDF()">🖨️ Cetak Daftar Nilai</button>
+            <button class="btn btn-primary" onclick="exportAnalysis()">📊 Cetak Analisis Soal</button>
+            <button class="btn btn-danger" onclick="clearAllData()">🗑️ Hapus Semua Data</button>
+        </div>
+    </div>
+
+    <script>
+        let examSettings = {
+            examName: '',
+            examClass: '',
+            subject: '',
+            material: '',
+            answerKeys: {
+                mc: [],
+                cc: [],
+                match: [],
+                short: [],
+                essay: []
+            },
+            counts: {
+                mc: 10,
+                cc: 5,
+                match: 5,
+                short: 5,
+                essay: 3
+            }
+        };
+        
+        let studentGrades = [];
+        
+        // Inisialisasi aplikasi
+        function initializeApp() {
+            generateAnswerInputs();
+            loadSettings();
+            setupButtonHandlers();
+        }
+        
+        // Setup button handlers
+        function setupButtonHandlers() {
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('answer-btn')) {
+                    const questionId = e.target.dataset.question;
+                    const value = e.target.dataset.value;
+                    const isMulti = e.target.classList.contains('multi');
+                    
+                    console.log('Button clicked:', questionId, value, isMulti);
+                    
+                    if (isMulti) {
+                        // Multi-select untuk pilihan ganda kompleks
+                        e.target.classList.toggle('active');
+                        const activeButtons = document.querySelectorAll(`[data-question="${questionId}"].active`);
+                        const values = Array.from(activeButtons).map(btn => btn.dataset.value);
+                        const hiddenInput = document.getElementById(questionId);
+                        if (hiddenInput) {
+                            hiddenInput.value = values.join(',');
+                            console.log('Multi-select updated:', questionId, hiddenInput.value);
+                        }
+                    } else {
+                        // Single select untuk yang lain
+                        const allButtons = document.querySelectorAll(`[data-question="${questionId}"]`);
+                        allButtons.forEach(btn => btn.classList.remove('active'));
+                        e.target.classList.add('active');
+                        const hiddenInput = document.getElementById(questionId);
+                        if (hiddenInput) {
+                            hiddenInput.value = value;
+                            console.log('Single-select updated:', questionId, hiddenInput.value);
+                        }
+                    }
+                    
+                    // Update live score jika ini jawaban siswa
+                    if (questionId.startsWith('student_')) {
+                        console.log('Updating live score for student answer...');
+                        setTimeout(updateLiveScore, 100); // Delay sedikit untuk memastikan value sudah terupdate
+                    }
+                }
+            });
+        }
+        
+        // Update skor secara real-time dengan sistem yang akurat
+        function updateLiveScore() {
+            if (!examSettings.answerKeys || !examSettings.counts) return;
+            
+            const result = calculateAccurateScore();
+            
+            // Update tampilan live score
+            document.getElementById('livePercentage').textContent = result.percentage + '%';
+            document.getElementById('liveTotalScore').textContent = `${result.totalScore}/${result.totalMaxScore}`;
+            
+            // Tampilkan score display
+            document.getElementById('liveScoreDisplay').style.display = 'block';
+            
+            // Debug log untuk melihat perhitungan
+            console.log('Live Score Update:', {
+                'PG': `${result.scores.mc}/${result.maxScores.mc}`,
+                'PGK': `${result.scores.cc}/${result.maxScores.cc}`,
+                'Match': `${result.scores.match}/${result.maxScores.match}`,
+                'Short': `${result.scores.short}/${result.maxScores.short}`,
+                'Essay': `${result.scores.essay}/${result.maxScores.essay}`,
+                'Total': `${result.totalScore}/${result.totalMaxScore} (${result.percentage}%)`
+            });
+        }
+        
+        // Fungsi perhitungan skor yang akurat dan terpusat
+        function calculateAccurateScore() {
+            let scores = { mc: 0, cc: 0, match: 0, short: 0, essay: 0 };
+            let details = { mc: [], cc: [], match: [], short: [], essay: [] };
+            
+            // Pastikan examSettings dan answerKeys ada
+            if (!examSettings || !examSettings.answerKeys || !examSettings.counts) {
+                console.log('ExamSettings tidak lengkap:', examSettings);
+                return {
+                    scores: scores,
+                    maxScores: { mc: 0, cc: 0, match: 0, short: 0, essay: 0 },
+                    details: details,
+                    totalScore: 0,
+                    totalMaxScore: 0,
+                    percentage: 0
+                };
+            }
+            
+            // PILIHAN GANDA - Skor 1 per soal benar
+            for (let i = 1; i <= (examSettings.counts.mc || 0); i++) {
+                const studentElement = document.getElementById(`student_mc_${i}`);
+                const studentAnswer = studentElement?.value?.trim().toUpperCase() || '';
+                const correctAnswer = (examSettings.answerKeys.mc[i-1] || '').toString().trim().toUpperCase();
+                
+                const isCorrect = studentAnswer !== '' && studentAnswer === correctAnswer;
+                if (isCorrect) scores.mc++;
+                
+                details.mc.push({
+                    question: i,
+                    studentAnswer: studentAnswer,
+                    correctAnswer: correctAnswer,
+                    isCorrect: isCorrect,
+                    score: isCorrect ? 1 : 0
+                });
+                
+                console.log(`PG ${i}: Student="${studentAnswer}" vs Correct="${correctAnswer}" = ${isCorrect}`);
+            }
+            
+            // PILIHAN GANDA KOMPLEKS - Skor berdasarkan jumlah jawaban benar yang dipilih
+            for (let i = 1; i <= (examSettings.counts.cc || 0); i++) {
+                const studentElement = document.getElementById(`student_cc_${i}`);
+                const studentAnswer = studentElement?.value || '';
+                const studentAnswers = studentAnswer.split(',')
+                    .map(a => a.trim().toUpperCase())
+                    .filter(a => a !== '')
+                    .sort();
+                
+                let correctAnswers = examSettings.answerKeys.cc[i-1] || [];
+                if (typeof correctAnswers === 'string') {
+                    correctAnswers = correctAnswers.split(',').map(a => a.trim().toUpperCase()).filter(a => a);
+                } else if (Array.isArray(correctAnswers)) {
+                    correctAnswers = correctAnswers.map(a => String(a).trim().toUpperCase());
+                }
+                correctAnswers = correctAnswers.sort();
+                
+                // Hitung berapa jawaban benar yang dipilih siswa
+                let correctCount = 0;
+                let wrongCount = 0;
+                
+                studentAnswers.forEach(ans => {
+                    if (correctAnswers.includes(ans)) {
+                        correctCount++;
+                    } else {
+                        wrongCount++;
+                    }
+                });
+                
+                // Skor = jumlah jawaban benar - jumlah jawaban salah (minimum 0)
+                const questionScore = Math.max(0, correctCount - wrongCount);
+                scores.cc += questionScore;
+                
+                details.cc.push({
+                    question: i,
+                    studentAnswer: studentAnswers.join(', '),
+                    correctAnswer: correctAnswers.join(', '),
+                    correctCount: correctCount,
+                    wrongCount: wrongCount,
+                    maxScore: correctAnswers.length,
+                    score: questionScore
+                });
+                
+                console.log(`PGK ${i}: Student=[${studentAnswers.join(',')}] vs Correct=[${correctAnswers.join(',')}] | Benar:${correctCount}, Salah:${wrongCount}, Skor:${questionScore}/${correctAnswers.length}`);
+            }
+            
+            // MENJODOHKAN - Skor 1 per soal benar
+            for (let i = 1; i <= (examSettings.counts.match || 0); i++) {
+                const studentElement = document.getElementById(`student_match_${i}`);
+                const studentAnswer = studentElement?.value?.trim().toUpperCase() || '';
+                const correctAnswer = (examSettings.answerKeys.match[i-1] || '').toString().trim().toUpperCase();
+                
+                const isCorrect = studentAnswer !== '' && studentAnswer === correctAnswer;
+                if (isCorrect) scores.match++;
+                
+                details.match.push({
+                    question: i,
+                    studentAnswer: studentAnswer,
+                    correctAnswer: correctAnswer,
+                    isCorrect: isCorrect,
+                    score: isCorrect ? 1 : 0
+                });
+                
+                console.log(`Match ${i}: Student="${studentAnswer}" vs Correct="${correctAnswer}" = ${isCorrect}`);
+            }
+            
+            // ISIAN SINGKAT - Skor 1 jika jawaban benar dan kunci jawaban = "1"
+            for (let i = 1; i <= (examSettings.counts.short || 0); i++) {
+                const studentElement = document.getElementById(`student_short_${i}`);
+                const studentAnswer = studentElement?.value?.trim() || '';
+                const correctAnswer = (examSettings.answerKeys.short[i-1] || '').toString().trim();
+                
+                // Untuk isian singkat: jika kunci jawaban "1" dan siswa jawab "1" = dapat skor
+                const isCorrect = studentAnswer === correctAnswer;
+                const scoreValue = isCorrect && correctAnswer === '1' ? 1 : 0;
+                scores.short += scoreValue;
+                
+                details.short.push({
+                    question: i,
+                    studentAnswer: studentAnswer,
+                    correctAnswer: correctAnswer,
+                    isCorrect: isCorrect,
+                    score: scoreValue
+                });
+                
+                console.log(`Short ${i}: Student="${studentAnswer}" vs Correct="${correctAnswer}" = ${isCorrect}, Score=${scoreValue}`);
+            }
+            
+            // URAIAN - Skor sesuai nilai yang diberikan guru
+            for (let i = 1; i <= (examSettings.counts.essay || 0); i++) {
+                const studentElement = document.getElementById(`student_essay_${i}`);
+                const studentScore = parseInt(studentElement?.value) || 0;
+                const maxScore = parseInt(examSettings.answerKeys.essay[i-1]) || 0;
+                const actualScore = Math.max(0, Math.min(studentScore, maxScore));
+                
+                scores.essay += actualScore;
+                
+                details.essay.push({
+                    question: i,
+                    studentScore: actualScore,
+                    maxScore: maxScore,
+                    score: actualScore
+                });
+                
+                console.log(`Essay ${i}: Student=${studentScore}, Max=${maxScore}, Actual=${actualScore}`);
+            }
+            
+            // Hitung skor maksimal untuk setiap tipe
+            const maxScores = {
+                mc: examSettings.counts.mc || 0,
+                cc: (examSettings.answerKeys.cc || []).reduce((sum, answers) => {
+                    if (Array.isArray(answers)) {
+                        return sum + answers.length;
+                    } else if (typeof answers === 'string') {
+                        return sum + answers.split(',').filter(a => a.trim()).length;
+                    }
+                    return sum;
+                }, 0),
+                match: examSettings.counts.match || 0,
+                short: (examSettings.answerKeys.short || []).filter(ans => ans === '1').length,
+                essay: (examSettings.answerKeys.essay || []).reduce((sum, score) => sum + parseInt(score || 0), 0)
+            };
+            
+            // Hitung total
+            const totalScore = scores.mc + scores.cc + scores.match + scores.short + scores.essay;
+            const totalMaxScore = maxScores.mc + maxScores.cc + maxScores.match + maxScores.short + maxScores.essay;
+            const percentage = totalMaxScore > 0 ? Math.round((totalScore / totalMaxScore) * 100) : 0;
+            
+            console.log('Final Calculation:', {
+                scores: scores,
+                maxScores: maxScores,
+                totalScore: totalScore,
+                totalMaxScore: totalMaxScore,
+                percentage: percentage
+            });
+            
+            return {
+                scores: scores,
+                maxScores: maxScores,
+                details: details,
+                totalScore: totalScore,
+                totalMaxScore: totalMaxScore,
+                percentage: percentage
+            };
+        }
+        
+        // Generate input untuk kunci jawaban
+        function generateAnswerInputs() {
+            const counts = {
+                mc: parseInt(document.getElementById('mcCount').value) || 0,
+                cc: parseInt(document.getElementById('ccCount').value) || 0,
+                match: parseInt(document.getElementById('matchCount').value) || 0,
+                short: parseInt(document.getElementById('shortCount').value) || 0,
+                essay: parseInt(document.getElementById('essayCount').value) || 0
+            };
+            
+            // Pilihan Ganda
+            const mcContainer = document.getElementById('mcAnswers');
+            mcContainer.innerHTML = '';
+            for (let i = 1; i <= counts.mc; i++) {
+                const div = document.createElement('div');
+                div.className = 'question-input';
+                div.innerHTML = `
+                    <span class="question-number">${i}.</span>
+                    <div class="button-group">
+                        <button type="button" class="answer-btn" data-question="mc_${i}" data-value="A">A</button>
+                        <button type="button" class="answer-btn" data-question="mc_${i}" data-value="B">B</button>
+                        <button type="button" class="answer-btn" data-question="mc_${i}" data-value="C">C</button>
+                        <button type="button" class="answer-btn" data-question="mc_${i}" data-value="D">D</button>
+                    </div>
+                    <input type="hidden" id="mc_${i}">
+                `;
+                mcContainer.appendChild(div);
+            }
+            
+            // Pilihan Ganda Kompleks
+            const ccContainer = document.getElementById('ccAnswers');
+            ccContainer.innerHTML = '';
+            for (let i = 1; i <= counts.cc; i++) {
+                const div = document.createElement('div');
+                div.className = 'question-input';
+                div.innerHTML = `
+                    <span class="question-number">${i}.</span>
+                    <div class="button-group">
+                        <button type="button" class="answer-btn multi" data-question="cc_${i}" data-value="A">A</button>
+                        <button type="button" class="answer-btn multi" data-question="cc_${i}" data-value="B">B</button>
+                        <button type="button" class="answer-btn multi" data-question="cc_${i}" data-value="C">C</button>
+                        <button type="button" class="answer-btn multi" data-question="cc_${i}" data-value="D">D</button>
+                    </div>
+                    <input type="hidden" id="cc_${i}">
+                `;
+                ccContainer.appendChild(div);
+            }
+            
+            // Menjodohkan
+            const matchContainer = document.getElementById('matchAnswers');
+            matchContainer.innerHTML = '';
+            for (let i = 1; i <= counts.match; i++) {
+                const div = document.createElement('div');
+                div.className = 'question-input';
+                
+                // Generate options dynamically based on match count
+                const maxOptions = counts.match;
+                const options = [];
+                for (let j = 0; j < maxOptions; j++) {
+                    const letter = String.fromCharCode(65 + j); // A, B, C, D, E, F, G, H, I, J
+                    options.push(`<button type="button" class="answer-btn" data-question="match_${i}" data-value="${letter}">${letter}</button>`);
+                }
+                
+                div.innerHTML = `
+                    <span class="question-number">${i}.</span>
+                    <div class="button-group">
+                        ${options.join('')}
+                    </div>
+                    <input type="hidden" id="match_${i}">
+                `;
+                matchContainer.appendChild(div);
+            }
+            
+            // Isian Singkat
+            const shortContainer = document.getElementById('shortAnswers');
+            shortContainer.innerHTML = '';
+            for (let i = 1; i <= counts.short; i++) {
+                const div = document.createElement('div');
+                div.className = 'question-input';
+                div.innerHTML = `
+                    <span class="question-number">${i}.</span>
+                    <div class="button-group">
+                        <button type="button" class="answer-btn" data-question="short_${i}" data-value="0">0</button>
+                        <button type="button" class="answer-btn" data-question="short_${i}" data-value="1">1</button>
+                    </div>
+                    <input type="hidden" id="short_${i}">
+                `;
+                shortContainer.appendChild(div);
+            }
+            
+            // Uraian
+            const essayContainer = document.getElementById('essayAnswers');
+            essayContainer.innerHTML = '';
+            for (let i = 1; i <= counts.essay; i++) {
+                const div = document.createElement('div');
+                div.className = 'question-input';
+                div.innerHTML = `
+                    <span class="question-number">${i}.</span>
+                    <div class="button-group">
+                        <button type="button" class="answer-btn" data-question="essay_${i}" data-value="0">0</button>
+                        <button type="button" class="answer-btn" data-question="essay_${i}" data-value="1">1</button>
+                        <button type="button" class="answer-btn" data-question="essay_${i}" data-value="2">2</button>
+                        <button type="button" class="answer-btn" data-question="essay_${i}" data-value="3">3</button>
+                        <button type="button" class="answer-btn" data-question="essay_${i}" data-value="4">4</button>
+                    </div>
+                    <input type="hidden" id="essay_${i}">
+                `;
+                essayContainer.appendChild(div);
+            }
+            
+            generateStudentAnswerInputs(counts);
+        }
+        
+        // Generate input untuk jawaban siswa
+        function generateStudentAnswerInputs(counts) {
+            const container = document.getElementById('answerSections');
+            container.innerHTML = '';
+            
+            // Pilihan Ganda
+            if (counts.mc > 0) {
+                const section = document.createElement('div');
+                section.className = 'question-type';
+                section.innerHTML = `
+                    <h4>📝 Pilihan Ganda</h4>
+                    <div id="studentMC"></div>
+                `;
+                container.appendChild(section);
+                
+                const mcContainer = document.getElementById('studentMC');
+                for (let i = 1; i <= counts.mc; i++) {
+                    const div = document.createElement('div');
+                    div.className = 'question-input';
+                    div.innerHTML = `
+                        <span class="question-number">${i}.</span>
+                        <div class="button-group">
+                            <button type="button" class="answer-btn" data-question="student_mc_${i}" data-value="A">A</button>
+                            <button type="button" class="answer-btn" data-question="student_mc_${i}" data-value="B">B</button>
+                            <button type="button" class="answer-btn" data-question="student_mc_${i}" data-value="C">C</button>
+                            <button type="button" class="answer-btn" data-question="student_mc_${i}" data-value="D">D</button>
+                        </div>
+                        <input type="hidden" id="student_mc_${i}">
+                    `;
+                    mcContainer.appendChild(div);
+                }
+            }
+            
+            // Pilihan Ganda Kompleks
+            if (counts.cc > 0) {
+                const section = document.createElement('div');
+                section.className = 'question-type';
+                section.innerHTML = `
+                    <h4>📋 Pilihan Ganda Kompleks</h4>
+                    <div id="studentCC"></div>
+                `;
+                container.appendChild(section);
+                
+                const ccContainer = document.getElementById('studentCC');
+                for (let i = 1; i <= counts.cc; i++) {
+                    const div = document.createElement('div');
+                    div.className = 'question-input';
+                    div.innerHTML = `
+                        <span class="question-number">${i}.</span>
+                        <div class="button-group">
+                            <button type="button" class="answer-btn multi" data-question="student_cc_${i}" data-value="A">A</button>
+                            <button type="button" class="answer-btn multi" data-question="student_cc_${i}" data-value="B">B</button>
+                            <button type="button" class="answer-btn multi" data-question="student_cc_${i}" data-value="C">C</button>
+                            <button type="button" class="answer-btn multi" data-question="student_cc_${i}" data-value="D">D</button>
+                        </div>
+                        <input type="hidden" id="student_cc_${i}">
+                    `;
+                    ccContainer.appendChild(div);
+                }
+            }
+            
+            // Menjodohkan
+            if (counts.match > 0) {
+                const section = document.createElement('div');
+                section.className = 'question-type';
+                section.innerHTML = `
+                    <h4>🔗 Menjodohkan</h4>
+                    <div id="studentMatch"></div>
+                `;
+                container.appendChild(section);
+                
+                const matchContainer = document.getElementById('studentMatch');
+                for (let i = 1; i <= counts.match; i++) {
+                    const div = document.createElement('div');
+                    div.className = 'question-input';
+                    
+                    // Generate options dynamically based on match count
+                    const maxOptions = counts.match;
+                    const options = [];
+                    for (let j = 0; j < maxOptions; j++) {
+                        const letter = String.fromCharCode(65 + j); // A, B, C, D, E, F, G, H, I, J
+                        options.push(`<button type="button" class="answer-btn" data-question="student_match_${i}" data-value="${letter}">${letter}</button>`);
+                    }
+                    
+                    div.innerHTML = `
+                        <span class="question-number">${i}.</span>
+                        <div class="button-group">
+                            ${options.join('')}
+                        </div>
+                        <input type="hidden" id="student_match_${i}">
+                    `;
+                    matchContainer.appendChild(div);
+                }
+            }
+            
+            // Isian Singkat
+            if (counts.short > 0) {
+                const section = document.createElement('div');
+                section.className = 'question-type';
+                section.innerHTML = `
+                    <h4>✍️ Isian Singkat</h4>
+                    <div id="studentShort"></div>
+                `;
+                container.appendChild(section);
+                
+                const shortContainer = document.getElementById('studentShort');
+                for (let i = 1; i <= counts.short; i++) {
+                    const div = document.createElement('div');
+                    div.className = 'question-input';
+                    div.innerHTML = `
+                        <span class="question-number">${i}.</span>
+                        <div class="button-group">
+                            <button type="button" class="answer-btn" data-question="student_short_${i}" data-value="0">0</button>
+                            <button type="button" class="answer-btn" data-question="student_short_${i}" data-value="1">1</button>
+                        </div>
+                        <input type="hidden" id="student_short_${i}">
+                    `;
+                    shortContainer.appendChild(div);
+                }
+            }
+            
+            // Uraian
+            if (counts.essay > 0) {
+                const section = document.createElement('div');
+                section.className = 'question-type';
+                section.innerHTML = `
+                    <h4>📄 Uraian</h4>
+                    <div id="studentEssay"></div>
+                `;
+                container.appendChild(section);
+                
+                const essayContainer = document.getElementById('studentEssay');
+                for (let i = 1; i <= counts.essay; i++) {
+                    const div = document.createElement('div');
+                    div.className = 'question-input';
+                    div.innerHTML = `
+                        <span class="question-number">${i}.</span>
+                        <div class="button-group">
+                            <button type="button" class="answer-btn" data-question="student_essay_${i}" data-value="0">0</button>
+                            <button type="button" class="answer-btn" data-question="student_essay_${i}" data-value="1">1</button>
+                            <button type="button" class="answer-btn" data-question="student_essay_${i}" data-value="2">2</button>
+                            <button type="button" class="answer-btn" data-question="student_essay_${i}" data-value="3">3</button>
+                            <button type="button" class="answer-btn" data-question="student_essay_${i}" data-value="4">4</button>
+                        </div>
+                        <input type="hidden" id="student_essay_${i}">
+                    `;
+                    essayContainer.appendChild(div);
+                }
+            }
+        }
+        
+        // Simpan pengaturan
+        function saveSettings() {
+            const settings = {
+                examName: document.getElementById('examName').value,
+                examClass: document.getElementById('examClass').value,
+                subject: document.getElementById('subject').value,
+                material: document.getElementById('material').value,
+                counts: {
+                    mc: parseInt(document.getElementById('mcCount').value) || 0,
+                    cc: parseInt(document.getElementById('ccCount').value) || 0,
+                    match: parseInt(document.getElementById('matchCount').value) || 0,
+                    short: parseInt(document.getElementById('shortCount').value) || 0,
+                    essay: parseInt(document.getElementById('essayCount').value) || 0
+                },
+                answerKeys: {
+                    mc: [],
+                    cc: [],
+                    match: [],
+                    short: [],
+                    essay: []
+                }
+            };
+            
+            // Validasi kunci jawaban sebelum menyimpan
+            let hasAnswerKeys = false;
+            
+            // Ambil kunci jawaban Pilihan Ganda
+            for (let i = 1; i <= settings.counts.mc; i++) {
+                const answer = document.getElementById(`mc_${i}`)?.value || '';
+                settings.answerKeys.mc.push(answer);
+                if (answer) hasAnswerKeys = true;
+            }
+            
+            // Ambil kunci jawaban Pilihan Ganda Kompleks
+            for (let i = 1; i <= settings.counts.cc; i++) {
+                const answer = document.getElementById(`cc_${i}`)?.value || '';
+                const answerArray = answer.split(',').map(a => a.trim().toUpperCase()).filter(a => a);
+                settings.answerKeys.cc.push(answerArray);
+                if (answerArray.length > 0) hasAnswerKeys = true;
+            }
+            
+            // Ambil kunci jawaban Menjodohkan
+            for (let i = 1; i <= settings.counts.match; i++) {
+                const answer = document.getElementById(`match_${i}`)?.value || '';
+                settings.answerKeys.match.push(answer);
+                if (answer) hasAnswerKeys = true;
+            }
+            
+            // Ambil kunci jawaban Isian Singkat
+            for (let i = 1; i <= settings.counts.short; i++) {
+                const answer = document.getElementById(`short_${i}`)?.value || '';
+                settings.answerKeys.short.push(answer);
+                if (answer) hasAnswerKeys = true;
+            }
+            
+            // Ambil skor maksimal Uraian
+            for (let i = 1; i <= settings.counts.essay; i++) {
+                const maxScore = parseInt(document.getElementById(`essay_${i}`)?.value) || 0;
+                settings.answerKeys.essay.push(maxScore);
+                if (maxScore > 0) hasAnswerKeys = true;
+            }
+            
+            if (!hasAnswerKeys) {
+                showAlert('warning', '⚠️ Belum ada kunci jawaban yang diatur!');
+                return;
+            }
+            
+            examSettings = settings;
+            localStorage.setItem('examSettings', JSON.stringify(settings));
+            localStorage.setItem('studentGrades', JSON.stringify(studentGrades));
+            
+            console.log('Settings saved:', examSettings);
+            
+            updateExamInfo();
+            
+            // Tampilkan notifikasi sukses
+            showAlert('success', '✅ Pengaturan berhasil disimpan! Beralih ke tab Koreksi...');
+            
+            // Auto pindah ke tab Koreksi setelah 1.5 detik
+            setTimeout(() => {
+                showTab('correction');
+                // Update tab active state
+                document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+                document.querySelector('[onclick="showTab(\'correction\')"]').classList.add('active');
+            }, 1500);
+        }
+        
+        // Muat pengaturan
+        function loadSettings() {
+            const saved = localStorage.getItem('examSettings');
+            const savedGrades = localStorage.getItem('studentGrades');
+            
+            if (saved) {
+                examSettings = JSON.parse(saved);
+                
+                // Isi form
+                document.getElementById('examName').value = examSettings.examName || '';
+                document.getElementById('examClass').value = examSettings.examClass || '';
+                document.getElementById('subject').value = examSettings.subject || '';
+                document.getElementById('material').value = examSettings.material || '';
+                
+                document.getElementById('mcCount').value = examSettings.counts.mc || 0;
+                document.getElementById('ccCount').value = examSettings.counts.cc || 0;
+                document.getElementById('matchCount').value = examSettings.counts.match || 0;
+                document.getElementById('shortCount').value = examSettings.counts.short || 0;
+                document.getElementById('essayCount').value = examSettings.counts.essay || 0;
+                
+                generateAnswerInputs();
+                
+                // Isi kunci jawaban
+                setTimeout(() => {
+                    examSettings.answerKeys.mc.forEach((answer, i) => {
+                        const element = document.getElementById(`mc_${i+1}`);
+                        if (element) {
+                            element.value = answer;
+                            const button = document.querySelector(`[data-question="mc_${i+1}"][data-value="${answer}"]`);
+                            if (button) button.classList.add('active');
+                        }
+                    });
+                    
+                    examSettings.answerKeys.cc.forEach((answers, i) => {
+                        const element = document.getElementById(`cc_${i+1}`);
+                        const answerArray = Array.isArray(answers) ? answers : answers.split(',').map(a => a.trim());
+                        if (element) {
+                            element.value = answerArray.join(',');
+                            answerArray.forEach(answer => {
+                                const button = document.querySelector(`[data-question="cc_${i+1}"][data-value="${answer}"]`);
+                                if (button) button.classList.add('active');
+                            });
+                        }
+                    });
+                    
+                    examSettings.answerKeys.match.forEach((answer, i) => {
+                        const element = document.getElementById(`match_${i+1}`);
+                        if (element) {
+                            element.value = answer;
+                            const button = document.querySelector(`[data-question="match_${i+1}"][data-value="${answer}"]`);
+                            if (button) button.classList.add('active');
+                        }
+                    });
+                    
+                    examSettings.answerKeys.short.forEach((answer, i) => {
+                        const element = document.getElementById(`short_${i+1}`);
+                        if (element) {
+                            element.value = answer;
+                            const button = document.querySelector(`[data-question="short_${i+1}"][data-value="${answer}"]`);
+                            if (button) button.classList.add('active');
+                        }
+                    });
+                    
+                    examSettings.answerKeys.essay.forEach((maxScore, i) => {
+                        const element = document.getElementById(`essay_${i+1}`);
+                        if (element) {
+                            element.value = maxScore;
+                            const button = document.querySelector(`[data-question="essay_${i+1}"][data-value="${maxScore}"]`);
+                            if (button) button.classList.add('active');
+                        }
+                    });
+                }, 100);
+                
+                updateExamInfo();
+                showAlert('success', '📂 Data berhasil dimuat!');
+            }
+            
+            if (savedGrades) {
+                studentGrades = JSON.parse(savedGrades);
+                updateGradesList();
+            }
+        }
+        
+        // Update info ujian
+        function updateExamInfo() {
+            const info = `
+                <h3>${examSettings.examName || 'Ujian'}</h3>
+                <div class="exam-details">
+                    <div><strong>Kelas:</strong> ${examSettings.examClass || '-'}</div>
+                    <div><strong>Mata Pelajaran:</strong> ${examSettings.subject || '-'}</div>
+                    <div><strong>Materi:</strong> ${examSettings.material || '-'}</div>
+                    <div><strong>Total Soal:</strong> ${Object.values(examSettings.counts).reduce((a, b) => a + b, 0)}</div>
+                </div>
+            `;
+            
+            document.getElementById('examInfoDisplay').innerHTML = info;
+            document.getElementById('examInfoDisplay').style.display = 'block';
+            
+            document.getElementById('examInfoResult').innerHTML = info;
+            document.getElementById('examInfoResult').style.display = 'block';
+        }
+        
+        // Koreksi jawaban dengan sistem yang akurat
+        function checkAnswers() {
+            const studentName = document.getElementById('studentName').value.trim();
+            const studentClass = document.getElementById('studentClass').value.trim();
+            
+            if (!studentName) {
+                showAlert('danger', '❌ Masukkan nama siswa!');
+                return;
+            }
+            
+            if (!examSettings.answerKeys || Object.keys(examSettings.answerKeys).length === 0) {
+                showAlert('danger', '❌ Kunci jawaban belum diatur! Silakan atur di tab Pengaturan.');
+                return;
+            }
+            
+            // Gunakan fungsi perhitungan yang sudah diperbaiki
+            const result = calculateAccurateScore();
+            
+            // Buat detail breakdown untuk setiap tipe soal
+            const breakdown = {
+                mc: result.details.mc.length > 0 ? `${result.scores.mc}/${result.maxScores.mc}` : '0/0',
+                cc: result.details.cc.length > 0 ? `${result.scores.cc}/${result.maxScores.cc}` : '0/0',
+                match: result.details.match.length > 0 ? `${result.scores.match}/${result.maxScores.match}` : '0/0',
+                short: result.details.short.length > 0 ? `${result.scores.short}/${result.maxScores.short}` : '0/0',
+                essay: result.details.essay.length > 0 ? `${result.scores.essay}/${result.maxScores.essay}` : '0/0'
+            };
+            
+            // Simpan data nilai siswa
+            const gradeData = {
+                name: studentName,
+                class: studentClass,
+                scores: result.scores,
+                maxScores: result.maxScores,
+                breakdown: breakdown,
+                details: result.details,
+                totalScore: result.totalScore,
+                totalMaxScore: result.totalMaxScore,
+                percentage: result.percentage,
+                date: new Date().toLocaleDateString('id-ID'),
+                time: new Date().toLocaleTimeString('id-ID')
+            };
+            
+            // Update atau tambah data siswa
+            const existingIndex = studentGrades.findIndex(g => 
+                g.name.toLowerCase() === studentName.toLowerCase() && 
+                g.class.toLowerCase() === studentClass.toLowerCase()
+            );
+            
+            if (existingIndex > -1) {
+                studentGrades[existingIndex] = gradeData;
+                showAlert('warning', `🔄 Data ${studentName} berhasil diperbarui! Nilai: ${result.percentage}%`);
+            } else {
+                studentGrades.push(gradeData);
+                showAlert('success', `✅ Koreksi selesai! ${studentName} - Nilai: ${result.percentage}%`);
+            }
+            
+            // Simpan ke localStorage
+            localStorage.setItem('studentGrades', JSON.stringify(studentGrades));
+            updateGradesList();
+            
+            // Tampilkan detail skor
+            console.log('Detail Skor:', {
+                'Pilihan Ganda': breakdown.mc,
+                'Pilihan Ganda Kompleks': breakdown.cc,
+                'Menjodohkan': breakdown.match,
+                'Isian Singkat': breakdown.short,
+                'Uraian': breakdown.essay,
+                'Total': `${result.totalScore}/${result.totalMaxScore} (${result.percentage}%)`
+            });
+        }
+        
+        // Update daftar nilai dengan format tabel yang rapi
+        function updateGradesList() {
+            const gradeList = document.getElementById('gradeList');
+            
+            if (studentGrades.length === 0) {
+                gradeList.innerHTML = `
+                    <h3 style="margin-bottom: 15px; color: #495057;">📊 Daftar Nilai</h3>
+                    <div style="text-align: center; color: #6c757d; padding: 20px;">
+                        Belum ada data nilai
+                    </div>
+                `;
+                return;
+            }
+            
+            // Urutkan berdasarkan persentase tertinggi
+            const sortedGrades = [...studentGrades].sort((a, b) => b.percentage - a.percentage);
+            
+            gradeList.innerHTML = `
+                <h3 style="margin-bottom: 15px; color: #495057;">📊 Daftar Nilai</h3>
+                <div style="background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                                <th style="padding: 12px 8px; text-align: center; font-weight: 600; font-size: 0.9rem;">No.</th>
+                                <th style="padding: 12px 8px; text-align: left; font-weight: 600; font-size: 0.9rem;">Nama</th>
+                                <th style="padding: 12px 8px; text-align: center; font-weight: 600; font-size: 0.9rem;">Kelas</th>
+                                <th style="padding: 12px 8px; text-align: center; font-weight: 600; font-size: 0.9rem;">Skor</th>
+                                <th style="padding: 12px 8px; text-align: center; font-weight: 600; font-size: 0.9rem;">Nilai</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gradesTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            const tbody = document.getElementById('gradesTableBody');
+            
+            sortedGrades.forEach((grade, index) => {
+                const statusColor = grade.percentage >= 85 ? '#28a745' : 
+                                  grade.percentage >= 75 ? '#17a2b8' : 
+                                  grade.percentage >= 60 ? '#ffc107' : '#dc3545';
+                
+                const row = document.createElement('tr');
+                row.style.cssText = `
+                    border-bottom: 1px solid #e9ecef; 
+                    transition: background-color 0.2s ease;
+                    cursor: pointer;
+                `;
+                
+                row.addEventListener('mouseenter', () => {
+                    row.style.backgroundColor = '#f8f9fa';
+                });
+                
+                row.addEventListener('mouseleave', () => {
+                    row.style.backgroundColor = 'white';
+                });
+                
+                row.addEventListener('click', () => {
+                    showGradeDetail(grade);
+                });
+                
+                row.innerHTML = `
+                    <td style="padding: 12px 8px; text-align: center; font-weight: 600; color: #6c757d;">
+                        ${index + 1}
+                    </td>
+                    <td style="padding: 12px 8px;">
+                        <div style="font-weight: 600; color: #495057; margin-bottom: 2px;">
+                            ${grade.name}
+                        </div>
+                        <div style="font-size: 0.75rem; color: #6c757d;">
+                            ${grade.date} ${grade.time || ''}
+                        </div>
+                    </td>
+                    <td style="padding: 12px 8px; text-align: center; color: #495057; font-weight: 500;">
+                        ${grade.class}
+                    </td>
+                    <td style="padding: 12px 8px; text-align: center;">
+                        <div style="font-weight: 600; color: #495057; font-size: 1rem;">
+                            ${grade.totalScore}/${grade.totalMaxScore}
+                        </div>
+                        ${grade.breakdown ? `
+                            <div style="font-size: 0.7rem; color: #6c757d; margin-top: 2px;">
+                                PG:${grade.breakdown.mc} PGK:${grade.breakdown.cc} J:${grade.breakdown.match} I:${grade.breakdown.short} U:${grade.breakdown.essay}
+                            </div>
+                        ` : ''}
+                    </td>
+                    <td style="padding: 12px 8px; text-align: center;">
+                        <div style="
+                            font-size: 1.2rem; 
+                            font-weight: 700; 
+                            color: ${statusColor};
+                            padding: 4px 8px;
+                            border-radius: 6px;
+                            background: ${statusColor}15;
+                            display: inline-block;
+                            min-width: 50px;
+                        ">
+                            ${grade.percentage}%
+                        </div>
+                        <div style="font-size: 0.7rem; color: #6c757d; margin-top: 2px;">
+                            Peringkat ${index + 1}
+                        </div>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            // Tambahkan statistik kelas
+            if (studentGrades.length > 0) {
+                const avgScore = studentGrades.reduce((sum, grade) => sum + grade.percentage, 0) / studentGrades.length;
+                const maxScore = Math.max(...studentGrades.map(g => g.percentage));
+                const minScore = Math.min(...studentGrades.map(g => g.percentage));
+                const passCount = studentGrades.filter(g => g.percentage >= 75).length;
+                const passRate = (passCount / studentGrades.length) * 100;
+                
+                const statsDiv = document.createElement('div');
+                statsDiv.style.cssText = 'background: #f8f9fa; padding: 15px; border-radius: 10px; margin-top: 15px; font-size: 0.9rem; border: 1px solid #e9ecef;';
+                statsDiv.innerHTML = `
+                    <h4 style="margin-bottom: 10px; color: #495057;">📈 Statistik Kelas</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div><strong>Rata-rata:</strong> <span style="color: #4facfe; font-weight: 600;">${Math.round(avgScore)}%</span></div>
+                        <div><strong>Tertinggi:</strong> <span style="color: #28a745; font-weight: 600;">${maxScore}%</span></div>
+                        <div><strong>Terendah:</strong> <span style="color: #dc3545; font-weight: 600;">${minScore}%</span></div>
+                        <div><strong>Ketuntasan:</strong> <span style="color: #17a2b8; font-weight: 600;">${Math.round(passRate)}%</span> (${passCount}/${studentGrades.length})</div>
+                    </div>
+                `;
+                gradeList.appendChild(statsDiv);
+            }
+        }
+        
+        // Tampilkan detail nilai siswa
+        function showGradeDetail(grade) {
+            const detailText = `
+DETAIL NILAI: ${grade.name}
+Kelas: ${grade.class}
+Tanggal: ${grade.date} ${grade.time || ''}
+
+BREAKDOWN SKOR:
+• Pilihan Ganda: ${grade.breakdown?.mc || '0/0'}
+• Pilihan Ganda Kompleks: ${grade.breakdown?.cc || '0/0'}  
+• Menjodohkan: ${grade.breakdown?.match || '0/0'}
+• Isian Singkat: ${grade.breakdown?.short || '0/0'}
+• Uraian: ${grade.breakdown?.essay || '0/0'}
+
+TOTAL: ${grade.totalScore}/${grade.totalMaxScore} (${grade.percentage}%)
+            `.trim();
+            
+            alert(detailText);
+        }
+        
+        // Reset jawaban
+        function resetAnswers() {
+            document.getElementById('studentName').value = '';
+            document.getElementById('studentClass').value = '';
+            
+            // Reset semua input jawaban
+            document.querySelectorAll('[id^="student_"]').forEach(input => {
+                input.value = '';
+            });
+            
+            // Reset semua button active state
+            document.querySelectorAll('[data-question^="student_"]').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Reset dan sembunyikan live score
+            document.getElementById('liveScoreDisplay').style.display = 'none';
+            document.getElementById('livePercentage').textContent = '0%';
+            document.getElementById('liveTotalScore').textContent = '0/0';
+            
+            showAlert('warning', '🔄 Jawaban telah direset');
+        }
+        
+        // Export ke PDF
+        function exportToPDF() {
+            if (studentGrades.length === 0) {
+                showAlert('warning', '⚠️ Belum ada data untuk dicetak');
+                return;
+            }
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Header
+            doc.setFontSize(16);
+            doc.text('DAFTAR NILAI SISWA', 20, 20);
+            
+            doc.setFontSize(12);
+            doc.text(`Ujian: ${examSettings.examName || 'Ujian'}`, 20, 35);
+            doc.text(`Kelas: ${examSettings.examClass || '-'}`, 20, 45);
+            doc.text(`Mata Pelajaran: ${examSettings.subject || '-'}`, 20, 55);
+            doc.text(`Materi: ${examSettings.material || '-'}`, 20, 65);
+            doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')}`, 20, 75);
+            
+            // Tabel
+            let yPos = 95;
+            doc.setFontSize(10);
+            doc.text('No', 20, yPos);
+            doc.text('Nama Siswa', 35, yPos);
+            doc.text('Kelas', 100, yPos);
+            doc.text('Nilai', 130, yPos);
+            doc.text('Skor', 155, yPos);
+            doc.text('Tanggal', 175, yPos);
+            
+            yPos += 5;
+            doc.line(20, yPos, 200, yPos);
+            yPos += 10;
+            
+            studentGrades.sort((a, b) => b.percentage - a.percentage).forEach((grade, index) => {
+                doc.text(`${index + 1}`, 20, yPos);
+                doc.text(grade.name.substring(0, 25), 35, yPos);
+                doc.text(grade.class, 100, yPos);
+                doc.text(`${grade.percentage}`, 130, yPos);
+                doc.text(`${grade.totalScore}/${grade.totalMaxScore}`, 155, yPos);
+                doc.text(grade.date, 175, yPos);
+                yPos += 8;
+                
+                if (yPos > 270) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+            });
+            
+            // Statistik
+            const avgScore = studentGrades.reduce((sum, grade) => sum + grade.percentage, 0) / studentGrades.length;
+            const maxScore = Math.max(...studentGrades.map(g => g.percentage));
+            const minScore = Math.min(...studentGrades.map(g => g.percentage));
+            
+            yPos += 15;
+            doc.setFontSize(12);
+            doc.text('STATISTIK:', 20, yPos);
+            yPos += 10;
+            doc.setFontSize(10);
+            doc.text(`Rata-rata Kelas: ${Math.round(avgScore)}`, 20, yPos);
+            yPos += 8;
+            doc.text(`Nilai Tertinggi: ${maxScore}`, 20, yPos);
+            yPos += 8;
+            doc.text(`Nilai Terendah: ${minScore}`, 20, yPos);
+            yPos += 8;
+            doc.text(`Jumlah Siswa: ${studentGrades.length}`, 20, yPos);
+            
+            doc.save(`daftar-nilai-${examSettings.examName || 'ujian'}-${new Date().toISOString().split('T')[0]}.pdf`);
+        }
+        
+        // Export Analisis Soal ke PDF
+        function exportAnalysis() {
+            if (studentGrades.length === 0) {
+                showAlert('warning', '⚠️ Belum ada data untuk analisis');
+                return;
+            }
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Header
+            doc.setFontSize(16);
+            doc.text('ANALISIS BUTIR SOAL', 20, 20);
+            
+            doc.setFontSize(12);
+            doc.text(`Ujian: ${examSettings.examName || 'Ujian'}`, 20, 35);
+            doc.text(`Kelas: ${examSettings.examClass || '-'}`, 20, 45);
+            doc.text(`Mata Pelajaran: ${examSettings.subject || '-'}`, 20, 55);
+            doc.text(`Materi: ${examSettings.material || '-'}`, 20, 65);
+            doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')}`, 20, 75);
+            doc.text(`Jumlah Peserta: ${studentGrades.length} siswa`, 20, 85);
+            
+            let yPos = 105;
+            
+            // Analisis per tipe soal
+            const types = [
+                { key: 'mc', name: 'Pilihan Ganda', count: examSettings.counts.mc },
+                { key: 'cc', name: 'Pilihan Ganda Kompleks', count: examSettings.counts.cc },
+                { key: 'match', name: 'Menjodohkan', count: examSettings.counts.match },
+                { key: 'short', name: 'Isian Singkat', count: examSettings.counts.short },
+                { key: 'essay', name: 'Uraian', count: examSettings.counts.essay }
+            ];
+            
+            types.forEach(type => {
+                if (type.count > 0) {
+                    doc.setFontSize(14);
+                    doc.text(`${type.name} (${type.count} soal)`, 20, yPos);
+                    yPos += 15;
+                    
+                    // Header tabel
+                    doc.setFontSize(10);
+                    doc.text('No', 20, yPos);
+                    doc.text('Tingkat Kesukaran', 35, yPos);
+                    doc.text('Daya Beda', 90, yPos);
+                    doc.text('Keterangan', 130, yPos);
+                    
+                    yPos += 5;
+                    doc.line(20, yPos, 190, yPos);
+                    yPos += 10;
+                    
+                    // Analisis per soal
+                    for (let i = 1; i <= type.count; i++) {
+                        let correctCount = 0;
+                        
+                        if (type.key === 'essay') {
+                            const maxScore = examSettings.answerKeys.essay[i-1] || 0;
+                            correctCount = studentGrades.filter(grade => {
+                                const studentScore = grade.details.essay[i-1]?.score || 0;
+                                return studentScore >= maxScore * 0.75; // 75% dari skor maksimal
+                            }).length;
+                        } else if (type.key === 'cc') {
+                            // Untuk PGK, hitung siswa yang mendapat skor penuh untuk soal ini
+                            correctCount = studentGrades.filter(grade => {
+                                const detail = grade.details.cc[i-1];
+                                return detail && detail.score === detail.maxScore;
+                            }).length;
+                        } else {
+                            // Untuk tipe lain (MC, Match, Short)
+                            correctCount = studentGrades.filter(grade => {
+                                const detail = grade.details[type.key][i-1];
+                                return detail && detail.isCorrect;
+                            }).length;
+                        }
+                        
+                        const difficulty = (correctCount / studentGrades.length) * 100;
+                        const difficultyLevel = difficulty >= 70 ? 'Mudah' : 
+                                              difficulty >= 30 ? 'Sedang' : 'Sukar';
+                        
+                        // Daya beda sederhana (27% atas vs 27% bawah)
+                        const sortedGrades = [...studentGrades].sort((a, b) => b.percentage - a.percentage);
+                        const topCount = Math.ceil(studentGrades.length * 0.27);
+                        const bottomCount = Math.ceil(studentGrades.length * 0.27);
+                        
+                        let topCorrect = 0;
+                        let bottomCorrect = 0;
+                        
+                        if (type.key === 'essay') {
+                            const maxScore = examSettings.answerKeys.essay[i-1] || 0;
+                            topCorrect = sortedGrades.slice(0, topCount).filter(grade => {
+                                const studentScore = grade.details.essay[i-1]?.score || 0;
+                                return studentScore >= maxScore * 0.75;
+                            }).length;
+                            bottomCorrect = sortedGrades.slice(-bottomCount).filter(grade => {
+                                const studentScore = grade.details.essay[i-1]?.score || 0;
+                                return studentScore >= maxScore * 0.75;
+                            }).length;
+                        } else if (type.key === 'cc') {
+                            topCorrect = sortedGrades.slice(0, topCount).filter(grade => {
+                                const detail = grade.details.cc[i-1];
+                                return detail && detail.score === detail.maxScore;
+                            }).length;
+                            bottomCorrect = sortedGrades.slice(-bottomCount).filter(grade => {
+                                const detail = grade.details.cc[i-1];
+                                return detail && detail.score === detail.maxScore;
+                            }).length;
+                        } else {
+                            topCorrect = sortedGrades.slice(0, topCount).filter(grade => {
+                                const detail = grade.details[type.key][i-1];
+                                return detail && detail.isCorrect;
+                            }).length;
+                            bottomCorrect = sortedGrades.slice(-bottomCount).filter(grade => {
+                                const detail = grade.details[type.key][i-1];
+                                return detail && detail.isCorrect;
+                            }).length;
+                        }
+                        
+                        const discrimination = ((topCorrect / topCount) - (bottomCorrect / bottomCount)) * 100;
+                        const discriminationLevel = discrimination >= 40 ? 'Baik' :
+                                                  discrimination >= 30 ? 'Cukup' :
+                                                  discrimination >= 20 ? 'Kurang' : 'Jelek';
+                        
+                        doc.text(`${i}`, 20, yPos);
+                        doc.text(`${Math.round(difficulty)}% (${difficultyLevel})`, 35, yPos);
+                        doc.text(`${Math.round(discrimination)}% (${discriminationLevel})`, 90, yPos);
+                        
+                        const recommendation = difficulty >= 70 && discrimination < 20 ? 'Revisi' :
+                                             difficulty < 30 && discrimination < 20 ? 'Buang' :
+                                             discrimination >= 30 ? 'Terima' : 'Revisi';
+                        doc.text(recommendation, 130, yPos);
+                        
+                        yPos += 8;
+                        
+                        if (yPos > 270) {
+                            doc.addPage();
+                            yPos = 20;
+                        }
+                    }
+                    
+                    yPos += 10;
+                }
+            });
+            
+            // Ringkasan Analisis
+            if (yPos > 200) {
+                doc.addPage();
+                yPos = 20;
+            }
+            
+            doc.setFontSize(14);
+            doc.text('RINGKASAN ANALISIS', 20, yPos);
+            yPos += 15;
+            
+            doc.setFontSize(10);
+            const totalQuestions = Object.values(examSettings.counts).reduce((a, b) => a + b, 0);
+            const avgScore = studentGrades.reduce((sum, grade) => sum + grade.percentage, 0) / studentGrades.length;
+            
+            doc.text(`Total Soal: ${totalQuestions}`, 20, yPos);
+            yPos += 8;
+            doc.text(`Rata-rata Nilai: ${Math.round(avgScore)}%`, 20, yPos);
+            yPos += 8;
+            doc.text(`Tingkat Kesukaran Rata-rata: ${avgScore >= 70 ? 'Mudah' : avgScore >= 50 ? 'Sedang' : 'Sukar'}`, 20, yPos);
+            yPos += 8;
+            
+            const passCount = studentGrades.filter(g => g.percentage >= 75).length;
+            const passRate = (passCount / studentGrades.length) * 100;
+            doc.text(`Tingkat Ketuntasan: ${Math.round(passRate)}% (${passCount}/${studentGrades.length} siswa)`, 20, yPos);
+            
+            doc.save(`analisis-soal-${examSettings.examName || 'ujian'}-${new Date().toISOString().split('T')[0]}.pdf`);
+        }
+        
+        // Hapus semua data
+        function clearAllData() {
+            if (confirm('⚠️ Yakin ingin menghapus semua data? Tindakan ini tidak dapat dibatalkan!')) {
+                localStorage.removeItem('examSettings');
+                localStorage.removeItem('studentGrades');
+                studentGrades = [];
+                examSettings = {
+                    examName: '',
+                    examClass: '',
+                    subject: '',
+                    material: '',
+                    answerKeys: { mc: [], cc: [], match: [], short: [], essay: [] },
+                    counts: { mc: 10, cc: 5, match: 5, short: 5, essay: 3 }
+                };
+                
+                updateGradesList();
+                document.getElementById('examInfoDisplay').style.display = 'none';
+                document.getElementById('examInfoResult').style.display = 'none';
+                
+                showAlert('success', '🗑️ Semua data berhasil dihapus');
+            }
+        }
+        
+        // Show tab
+        function showTab(tabName) {
+            document.querySelectorAll('.content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(tabName).classList.remove('hidden');
+            
+            // Update active tab - handle both event-based and programmatic calls
+            if (event && event.target) {
+                event.target.classList.add('active');
+            } else {
+                // For programmatic calls, find the correct tab button
+                const tabButton = document.querySelector(`[onclick="showTab('${tabName}')"]`);
+                if (tabButton) {
+                    tabButton.classList.add('active');
+                }
+            }
+        }
+        
+        // Show alert
+        function showAlert(type, message) {
+            const existingAlert = document.querySelector('.alert');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+            
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            const activeContent = document.querySelector('.content:not(.hidden)');
+            activeContent.insertBefore(alert, activeContent.firstChild);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+        
+        // Inisialisasi aplikasi saat halaman dimuat
+        window.onload = initializeApp;
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96ba708e71365f4b',t:'MTc1NDYwODE0Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
