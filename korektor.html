@@ -444,7 +444,7 @@
     <div class="container">
         <div class="header">
             <h1>📝 Koreksi Jawaban Siswa</h1>
-            <p>Ide kreatif: Mahfud Sidik</p>
+            <p>Sistem Penilaian Digital Lengkap</p>
         </div>
         
         <div class="tabs">
@@ -524,6 +524,14 @@
             
             <button class="btn btn-primary" onclick="saveSettings()">💾 Simpan Pengaturan</button>
             <button class="btn btn-warning" onclick="loadSettings()">📂 Muat Data Tersimpan</button>
+            
+            <div style="background: #e3f2fd; border: 1px solid #90caf9; border-radius: 8px; padding: 12px; margin-top: 15px; font-size: 0.85rem;">
+                <h4 style="margin: 0 0 8px 0; color: #1565c0; font-size: 0.9rem;">💡 Panduan Penggunaan:</h4>
+                <ul style="margin: 0; padding-left: 18px; color: #1976d2;">
+                    <li><strong>Simpan Pengaturan:</strong> Menyimpan kunci jawaban dan otomatis membuka tab Koreksi</li>
+                    <li><strong>Muat Data Tersimpan:</strong> Memuat kembali pengaturan ujian dan data nilai yang pernah disimpan</li>
+                </ul>
+            </div>
         </div>
         
         <!-- Tab Koreksi -->
@@ -1239,52 +1247,58 @@
             // Tampilkan notifikasi sukses
             showAlert('success', '✅ Pengaturan berhasil disimpan! Beralih ke tab Koreksi...');
             
-            // Auto pindah ke tab Koreksi setelah 1.5 detik
+            // Auto pindah ke tab Koreksi setelah 1 detik
             setTimeout(() => {
                 showTab('correction');
-                // Update tab active state
-                document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-                document.querySelector('[onclick="showTab(\'correction\')"]').classList.add('active');
-            }, 1500);
+            }, 1000);
         }
         
-        // Muat pengaturan
+        // Muat pengaturan tersimpan
         function loadSettings() {
             const saved = localStorage.getItem('examSettings');
             const savedGrades = localStorage.getItem('studentGrades');
             
-            if (saved) {
+            if (!saved) {
+                showAlert('warning', '⚠️ Tidak ada data tersimpan yang ditemukan!');
+                return;
+            }
+            
+            try {
                 examSettings = JSON.parse(saved);
                 
-                // Isi form
+                // Isi form identitas ujian
                 document.getElementById('examName').value = examSettings.examName || '';
                 document.getElementById('examClass').value = examSettings.examClass || '';
                 document.getElementById('subject').value = examSettings.subject || '';
                 document.getElementById('material').value = examSettings.material || '';
                 
+                // Isi jumlah soal
                 document.getElementById('mcCount').value = examSettings.counts.mc || 0;
                 document.getElementById('ccCount').value = examSettings.counts.cc || 0;
                 document.getElementById('matchCount').value = examSettings.counts.match || 0;
                 document.getElementById('shortCount').value = examSettings.counts.short || 0;
                 document.getElementById('essayCount').value = examSettings.counts.essay || 0;
                 
+                // Generate ulang input berdasarkan jumlah soal
                 generateAnswerInputs();
                 
-                // Isi kunci jawaban
+                // Isi kunci jawaban yang tersimpan
                 setTimeout(() => {
+                    // Pilihan Ganda
                     examSettings.answerKeys.mc.forEach((answer, i) => {
                         const element = document.getElementById(`mc_${i+1}`);
-                        if (element) {
+                        if (element && answer) {
                             element.value = answer;
                             const button = document.querySelector(`[data-question="mc_${i+1}"][data-value="${answer}"]`);
                             if (button) button.classList.add('active');
                         }
                     });
                     
+                    // Pilihan Ganda Kompleks
                     examSettings.answerKeys.cc.forEach((answers, i) => {
                         const element = document.getElementById(`cc_${i+1}`);
-                        const answerArray = Array.isArray(answers) ? answers : answers.split(',').map(a => a.trim());
-                        if (element) {
+                        if (element && answers) {
+                            const answerArray = Array.isArray(answers) ? answers : answers.split(',').map(a => a.trim());
                             element.value = answerArray.join(',');
                             answerArray.forEach(answer => {
                                 const button = document.querySelector(`[data-question="cc_${i+1}"][data-value="${answer}"]`);
@@ -1293,41 +1307,60 @@
                         }
                     });
                     
+                    // Menjodohkan
                     examSettings.answerKeys.match.forEach((answer, i) => {
                         const element = document.getElementById(`match_${i+1}`);
-                        if (element) {
+                        if (element && answer) {
                             element.value = answer;
                             const button = document.querySelector(`[data-question="match_${i+1}"][data-value="${answer}"]`);
                             if (button) button.classList.add('active');
                         }
                     });
                     
+                    // Isian Singkat
                     examSettings.answerKeys.short.forEach((answer, i) => {
                         const element = document.getElementById(`short_${i+1}`);
-                        if (element) {
+                        if (element && answer) {
                             element.value = answer;
                             const button = document.querySelector(`[data-question="short_${i+1}"][data-value="${answer}"]`);
                             if (button) button.classList.add('active');
                         }
                     });
                     
+                    // Uraian (skor maksimal)
                     examSettings.answerKeys.essay.forEach((maxScore, i) => {
                         const element = document.getElementById(`essay_${i+1}`);
-                        if (element) {
+                        if (element && maxScore) {
                             element.value = maxScore;
                             const button = document.querySelector(`[data-question="essay_${i+1}"][data-value="${maxScore}"]`);
                             if (button) button.classList.add('active');
                         }
                     });
-                }, 100);
+                    
+                    console.log('Kunci jawaban berhasil dimuat:', examSettings.answerKeys);
+                }, 200);
                 
+                // Update info ujian
                 updateExamInfo();
-                showAlert('success', '📂 Data berhasil dimuat!');
+                
+                // Tampilkan notifikasi sukses
+                showAlert('success', '📂 Data ujian dan kunci jawaban berhasil dimuat!');
+                
+            } catch (error) {
+                console.error('Error loading settings:', error);
+                showAlert('danger', '❌ Gagal memuat data! File mungkin rusak.');
             }
             
+            // Muat data nilai siswa jika ada
             if (savedGrades) {
-                studentGrades = JSON.parse(savedGrades);
-                updateGradesList();
+                try {
+                    studentGrades = JSON.parse(savedGrades);
+                    updateGradesList();
+                    showAlert('success', `📊 Data ${studentGrades.length} nilai siswa berhasil dimuat!`);
+                } catch (error) {
+                    console.error('Error loading grades:', error);
+                    showAlert('warning', '⚠️ Data nilai siswa gagal dimuat!');
+                }
             }
         }
         
@@ -1920,5 +1953,5 @@ TOTAL: ${grade.totalScore}/${grade.totalMaxScore} (${grade.percentage}%)
         // Inisialisasi aplikasi saat halaman dimuat
         window.onload = initializeApp;
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96ba830d0471ce5b',t:'MTc1NDYwODkwMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96ba925d72ee5683',t:'MTc1NDYwOTUzMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
