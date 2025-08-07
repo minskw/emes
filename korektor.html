@@ -444,7 +444,7 @@
     <div class="container">
         <div class="header">
             <h1>📝 Koreksi Jawaban Siswa</h1>
-            <p>Ide kreatif: MAHFUD SIDIK</p>
+            <p>Ide kreatif: Mahfud Sidik</p>
         </div>
         
         <div class="tabs">
@@ -609,6 +609,12 @@
             generateAnswerInputs();
             loadSettings();
             setupButtonHandlers();
+            
+            // PERBAIKAN: Inisialisasi skor realtime setelah semua setup selesai
+            setTimeout(() => {
+                console.log('Initializing live score...');
+                updateLiveScore();
+            }, 500);
         }
         
         // Setup button handlers
@@ -643,37 +649,68 @@
                         }
                     }
                     
-                    // Update live score jika ini jawaban siswa
+                    // Update live score jika ini jawaban siswa - PERBAIKAN: langsung panggil tanpa delay
                     if (questionId.startsWith('student_')) {
                         console.log('Updating live score for student answer...');
-                        setTimeout(updateLiveScore, 100); // Delay sedikit untuk memastikan value sudah terupdate
+                        updateLiveScore();
                     }
+                }
+            });
+            
+            // TAMBAHAN: Event listener untuk input manual (jika ada)
+            document.addEventListener('input', function(e) {
+                if (e.target.id && e.target.id.startsWith('student_')) {
+                    console.log('Input changed:', e.target.id, e.target.value);
+                    updateLiveScore();
                 }
             });
         }
         
         // Update skor secara real-time dengan sistem yang akurat
         function updateLiveScore() {
-            if (!examSettings.answerKeys || !examSettings.counts) return;
+            console.log('updateLiveScore called');
+            
+            // Cek apakah examSettings sudah ada dan valid
+            if (!examSettings || !examSettings.answerKeys || !examSettings.counts) {
+                console.log('ExamSettings not ready:', examSettings);
+                return;
+            }
+            
+            // Cek apakah ada kunci jawaban yang sudah diatur
+            const hasAnswerKeys = Object.values(examSettings.answerKeys).some(keys => 
+                Array.isArray(keys) && keys.length > 0 && keys.some(key => key !== '' && key !== null && key !== undefined)
+            );
+            
+            if (!hasAnswerKeys) {
+                console.log('No answer keys set yet');
+                return;
+            }
             
             const result = calculateAccurateScore();
             
             // Update tampilan live score
-            document.getElementById('livePercentage').textContent = result.percentage + '%';
-            document.getElementById('liveTotalScore').textContent = `${result.totalScore}/${result.totalMaxScore}`;
+            const livePercentageEl = document.getElementById('livePercentage');
+            const liveTotalScoreEl = document.getElementById('liveTotalScore');
+            const liveScoreDisplayEl = document.getElementById('liveScoreDisplay');
             
-            // Tampilkan score display
-            document.getElementById('liveScoreDisplay').style.display = 'block';
-            
-            // Debug log untuk melihat perhitungan
-            console.log('Live Score Update:', {
-                'PG': `${result.scores.mc}/${result.maxScores.mc}`,
-                'PGK': `${result.scores.cc}/${result.maxScores.cc}`,
-                'Match': `${result.scores.match}/${result.maxScores.match}`,
-                'Short': `${result.scores.short}/${result.maxScores.short}`,
-                'Essay': `${result.scores.essay}/${result.maxScores.essay}`,
-                'Total': `${result.totalScore}/${result.totalMaxScore} (${result.percentage}%)`
-            });
+            if (livePercentageEl && liveTotalScoreEl && liveScoreDisplayEl) {
+                livePercentageEl.textContent = result.percentage + '%';
+                liveTotalScoreEl.textContent = `${result.totalScore}/${result.totalMaxScore}`;
+                
+                // Tampilkan score display
+                liveScoreDisplayEl.style.display = 'block';
+                
+                console.log('Live Score Updated Successfully:', {
+                    'PG': `${result.scores.mc}/${result.maxScores.mc}`,
+                    'PGK': `${result.scores.cc}/${result.maxScores.cc}`,
+                    'Match': `${result.scores.match}/${result.maxScores.match}`,
+                    'Short': `${result.scores.short}/${result.maxScores.short}`,
+                    'Essay': `${result.scores.essay}/${result.maxScores.essay}`,
+                    'Total': `${result.totalScore}/${result.totalMaxScore} (${result.percentage}%)`
+                });
+            } else {
+                console.log('Live score elements not found');
+            }
         }
         
         // Fungsi perhitungan skor yang akurat dan terpusat
@@ -1373,6 +1410,12 @@
             localStorage.setItem('studentGrades', JSON.stringify(studentGrades));
             updateGradesList();
             
+            // PERBAIKAN: Auto reset form setelah simpan
+            setTimeout(() => {
+                resetAnswers();
+                showAlert('success', '🔄 Form siap untuk siswa berikutnya!');
+            }, 1500);
+            
             // Tampilkan detail skor
             console.log('Detail Skor:', {
                 'Pilihan Ganda': breakdown.mc,
@@ -1845,6 +1888,14 @@ TOTAL: ${grade.totalScore}/${grade.totalMaxScore} (${grade.percentage}%)
                     tabButton.classList.add('active');
                 }
             }
+            
+            // PERBAIKAN: Trigger update skor realtime saat tab koreksi dibuka
+            if (tabName === 'correction') {
+                console.log('Correction tab opened, triggering live score update...');
+                setTimeout(() => {
+                    updateLiveScore();
+                }, 200);
+            }
         }
         
         // Show alert
@@ -1869,5 +1920,5 @@ TOTAL: ${grade.totalScore}/${grade.totalMaxScore} (${grade.percentage}%)
         // Inisialisasi aplikasi saat halaman dimuat
         window.onload = initializeApp;
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96ba708e71365f4b',t:'MTc1NDYwODE0Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96ba830d0471ce5b',t:'MTc1NDYwODkwMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
