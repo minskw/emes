@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penilaian Sumatif Al-Quran Hadits - Hukum Bacaan Mim Mati</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #87CEEB 0%, #4682B4 100%);
+            min-height: 100vh;
+        }
+        .card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        .notification {
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @media print {
+            body * { visibility: hidden; }
+            .print-area, .print-area * { visibility: visible; }
+            .print-area { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <!-- Mode Selection Screen -->
+    <div id="modeSelection" class="min-h-screen flex items-center justify-center p-4">
+        <div class="card rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-blue-800 mb-2">📖 Penilaian Sumatif</h1>
+                <h2 class="text-lg font-semibold text-blue-700">Al-Quran Hadits</h2>
+                <p class="text-blue-600 mt-2">Materi: Hukum Bacaan Mim Mati</p>
+                <p class="text-blue-600">Kelas V</p>
+            </div>
+            <div class="space-y-4">
+                <button onclick="showTeacherLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition duration-300 transform hover:scale-105">
+                    👨‍🏫 Mode Guru
+                </button>
+                <button onclick="showStudentLogin()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl transition duration-300 transform hover:scale-105">
+                    👨‍🎓 Mode Siswa
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teacher Login -->
+    <div id="teacherLogin" class="min-h-screen flex items-center justify-center p-4 hidden">
+        <div class="card rounded-2xl shadow-2xl p-8 max-w-md w-full">
+            <h2 class="text-2xl font-bold text-blue-800 mb-6 text-center">🔐 Login Guru</h2>
+            <div class="space-y-4">
+                <input type="password" id="teacherPassword" placeholder="Masukkan password" class="w-full p-3 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button onclick="loginTeacher()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                    Masuk
+                </button>
+                <button onclick="backToModeSelection()" class="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                    Kembali
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Login -->
+    <div id="studentLogin" class="min-h-screen flex items-center justify-center p-4 hidden">
+        <div class="card rounded-2xl shadow-2xl p-8 max-w-md w-full">
+            <h2 class="text-2xl font-bold text-blue-800 mb-6 text-center">📝 Login Siswa</h2>
+            <div class="space-y-4">
+                <input type="text" id="studentName" placeholder="Nama Lengkap" class="w-full p-3 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select id="studentClass" class="w-full p-3 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">Pilih Kelas</option>
+                    <option value="V-A">V-A</option>
+                    <option value="V-B">V-B</option>
+                </select>
+                <button onclick="loginStudent()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                    Mulai Ujian
+                </button>
+                <button onclick="backToModeSelection()" class="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                    Kembali
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teacher Dashboard -->
+    <div id="teacherDashboard" class="min-h-screen p-4 hidden">
+        <div class="max-w-6xl mx-auto">
+            <div class="card rounded-2xl shadow-2xl p-6 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-blue-800">📊 Dashboard Guru</h2>
+                    <div class="space-x-2">
+                        <button onclick="printResults()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                            🖨️ Cetak Daftar Nilai
+                        </button>
+                        <button onclick="logoutTeacher()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                            🚪 Logout
+                        </button>
+                    </div>
+                </div>
+                <div id="studentResults" class="space-y-4">
+                    <p class="text-gray-600 text-center py-8">Belum ada siswa yang mengerjakan ujian</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Exam -->
+    <div id="studentExam" class="min-h-screen p-4 hidden">
+        <div class="max-w-4xl mx-auto">
+            <div class="card rounded-2xl shadow-2xl p-6 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-blue-800" id="studentNameDisplay"></h2>
+                        <p class="text-blue-600" id="studentClassDisplay"></p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-2xl font-bold text-red-600" id="timer">60:00</div>
+                        <button onclick="finishExam()" class="mt-2 bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                            Selesai Ujian
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <div class="bg-blue-100 rounded-lg p-3">
+                        <div class="flex justify-between text-sm text-blue-700">
+                            <span>Soal <span id="currentQuestion">1</span> dari 20</span>
+                            <span>Benar: <span id="correctCount">0</span> | Salah: <span id="wrongCount">0</span></span>
+                        </div>
+                    </div>
+                </div>
+                <div id="questionContainer" class="mb-6">
+                    <!-- Questions will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Result -->
+    <div id="studentResult" class="min-h-screen flex items-center justify-center p-4 hidden">
+        <div class="card rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+            <h2 class="text-2xl font-bold text-blue-800 mb-6">🎉 Hasil Ujian</h2>
+            <div id="finalResult" class="space-y-4 mb-6">
+                <!-- Result will be shown here -->
+            </div>
+            <button onclick="backToModeSelection()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                Kembali ke Menu Utama
+            </button>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="fixed top-4 right-4 p-4 rounded-lg shadow-lg hidden notification z-50">
+        <div id="notificationContent"></div>
+    </div>
+
+    <script>
+        // Questions data
+        const questions = [
+            // Level 2 Questions (15 questions)
+            {
+                level: 2,
+                question: "Apa yang dimaksud dengan mim mati?",
+                options: ["Mim yang dibaca panjang", "Mim yang tidak berharakat", "Mim yang berharakat fathah", "Mim yang berharakat kasrah"],
+                correct: 1
+            },
+            {
+                level: 2,
+                question: "Berapa jumlah hukum bacaan mim mati?",
+                options: ["2", "3", "4", "5"],
+                correct: 1
+            },
+            {
+                level: 2,
+                question: "Hukum bacaan mim mati jika bertemu dengan huruf ba' adalah...",
+                options: ["Ikhfa' Syafawi", "Idgham Mimi", "Izhar Syafawi", "Iqlab"],
+                correct: 0
+            },
+            {
+                level: 2,
+                question: "Cara membaca Ikhfa' Syafawi adalah...",
+                options: ["Jelas dan tegas", "Samar-samar dengan dengung", "Panjang 2 harakat", "Pendek dan cepat"],
+                correct: 1
+            },
+            {
+                level: 2,
+                question: "Hukum bacaan mim mati jika bertemu dengan huruf mim adalah...",
+                options: ["Ikhfa' Syafawi", "Idgham Mimi", "Izhar Syafawi", "Iqlab"],
+                correct: 1
+            },
+            {
+                level: 2,
+                question: "Cara membaca Idgham Mimi adalah...",
+                options: ["Jelas tanpa dengung", "Dimasukkan dengan dengung", "Samar-samar", "Dipanjangkan"],
+                correct: 1
+            },
+            {
+                level: 2,
+                question: "Hukum bacaan mim mati selain bertemu ba' dan mim adalah...",
+                options: ["Ikhfa' Syafawi", "Idgham Mimi", "Izhar Syafawi", "Iqlab"],
+                correct: 2
+            },
+            {
+                level: 2,
+                question: "Cara membaca Izhar Syafawi adalah...",
+                options: ["Samar-samar", "Jelas dan tegas", "Dengan dengung", "Dipanjangkan"],
+                correct: 1
+            },
+            {
+                level: 2,
+                question: "Huruf yang menyebabkan Ikhfa' Syafawi adalah...",
+                options: ["Ba'", "Mim", "Nun", "Waw"],
+                correct: 0
+            },
+            {
+                level: 2,
+                question: "Huruf yang menyebabkan Idgham Mimi adalah...",
+                options: ["Ba'", "Mim", "Nun", "Fa'"],
+                correct: 1
+            },
+            {
+                level: 2,
+                question: "Contoh bacaan Ikhfa' Syafawi terdapat pada kata...",
+                options: ["أَمْ بَعْدَ", "مِمَّا", "أَمْ تَرَى", "مِنْ بَعْدِ"],
+                correct: 0
+            },
+            {
+                level: 2,
+                question: "Contoh bacaan Idgham Mimi terdapat pada kata...",
+                options: ["أَمْ بَعْدَ", "مِمَّا", "أَمْ تَرَى", "مِنْ قَبْلِ"],
+                correct: 1
+            },
+            {
+                level: 2,
+                question: "Contoh bacaan Izhar Syafawi terdapat pada kata...",
+                options: ["أَمْ بَعْدَ", "مِمَّا", "أَمْ تَرَى", "مِنْ بَعْدِ"],
+                correct: 2
+            },
+            {
+                level: 2,
+                question: "Mim mati dilambangkan dengan tanda...",
+                options: ["Sukun", "Fathah", "Kasrah", "Dhammah"],
+                correct: 0
+            },
+            {
+                level: 2,
+                question: "Ikhfa' Syafawi artinya...",
+                options: ["Jelas bibir", "Samar bibir", "Masuk bibir", "Panjang bibir"],
+                correct: 1
+            },
+            // Level 3 Questions (5 questions)
+            {
+                level: 3,
+                question: "Dalam ayat 'وَمَا أَنتُم بِمُعْجِزِينَ', hukum bacaan mim mati pada kata 'أَنتُم بِمُعْجِزِينَ' adalah...",
+                options: ["Ikhfa' Syafawi", "Idgham Mimi", "Izhar Syafawi", "Tidak ada mim mati"],
+                correct: 0
+            },
+            {
+                level: 3,
+                question: "Mengapa Ikhfa' Syafawi harus dibaca dengan menutup bibir?",
+                options: ["Karena mim dan ba' sama-sama huruf bibir", "Karena lebih mudah", "Karena tradisi", "Karena lebih indah"],
+                correct: 0
+            },
+            {
+                level: 3,
+                question: "Perbedaan utama antara Idgham Mimi dengan Idgham Bighunnah adalah...",
+                options: ["Tidak ada perbedaan", "Idgham Mimi khusus untuk mim", "Idgham Mimi tidak ada dengung", "Idgham Mimi lebih panjang"],
+                correct: 1
+            },
+            {
+                level: 3,
+                question: "Dalam membaca Izhar Syafawi, mengapa mim mati harus dibaca jelas?",
+                options: ["Agar tidak tertukar dengan huruf lain", "Karena tidak ada huruf yang mempengaruhi", "Karena mudah dibaca", "Semua jawaban benar"],
+                correct: 3
+            },
+            {
+                level: 3,
+                question: "Jika dalam satu ayat terdapat mim mati bertemu ba', mim, dan ta', urutan hukum bacaannya adalah...",
+                options: ["Ikhfa', Idgham, Izhar", "Izhar, Ikhfa', Idgham", "Idgham, Izhar, Ikhfa'", "Tergantung posisinya"],
+                correct: 0
+            }
+        ];
+
+        // Global variables
+        let currentUser = null;
+        let currentQuestionIndex = 0;
+        let studentAnswers = [];
+        let correctAnswers = 0;
+        let wrongAnswers = 0;
+        let timeLeft = 3600; // 60 minutes in seconds
+        let timerInterval = null;
+        let examFinished = false;
+        let studentResults = JSON.parse(localStorage.getItem('studentResults') || '[]');
+
+        // Utility functions
+        function showScreen(screenId) {
+            const screens = ['modeSelection', 'teacherLogin', 'studentLogin', 'teacherDashboard', 'studentExam', 'studentResult'];
+            screens.forEach(screen => {
+                document.getElementById(screen).classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            const content = document.getElementById('notificationContent');
+            
+            const colors = {
+                success: 'bg-green-500 text-white',
+                error: 'bg-red-500 text-white',
+                info: 'bg-blue-500 text-white'
+            };
+            
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg notification z-50 ${colors[type]}`;
+            content.innerHTML = message;
+            notification.classList.remove('hidden');
+            
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Mode selection functions
+        function showTeacherLogin() {
+            showScreen('teacherLogin');
+        }
+
+        function showStudentLogin() {
+            showScreen('studentLogin');
+        }
+
+        function backToModeSelection() {
+            showScreen('modeSelection');
+            // Reset forms
+            document.getElementById('teacherPassword').value = '';
+            document.getElementById('studentName').value = '';
+            document.getElementById('studentClass').value = '';
+        }
+
+        // Teacher functions
+        function loginTeacher() {
+            const password = document.getElementById('teacherPassword').value;
+            if (password === 'Kimia25') {
+                currentUser = { type: 'teacher' };
+                showScreen('teacherDashboard');
+                loadStudentResults();
+                showNotification('Login berhasil! Selamat datang, Guru.', 'success');
+            } else {
+                showNotification('Password Anda salah!', 'error');
+            }
+        }
+
+        function logoutTeacher() {
+            currentUser = null;
+            showScreen('modeSelection');
+            showNotification('Logout berhasil!', 'info');
+        }
+
+        function loadStudentResults() {
+            const container = document.getElementById('studentResults');
+            if (studentResults.length === 0) {
+                container.innerHTML = '<p class="text-gray-600 text-center py-8">Belum ada siswa yang mengerjakan ujian</p>';
+                return;
+            }
+
+            let html = '<div class="print-area">';
+            html += '<h3 class="text-xl font-bold text-blue-800 mb-4 text-center">📋 Daftar Nilai Siswa</h3>';
+            html += '<p class="text-center mb-6 text-blue-600">Penilaian Sumatif Al-Quran Hadits - Hukum Bacaan Mim Mati - Kelas V</p>';
+            html += '<div class="overflow-x-auto">';
+            html += '<table class="w-full border-collapse border border-blue-300">';
+            html += '<thead><tr class="bg-blue-100">';
+            html += '<th class="border border-blue-300 p-3 text-left">No</th>';
+            html += '<th class="border border-blue-300 p-3 text-left">Nama</th>';
+            html += '<th class="border border-blue-300 p-3 text-left">Kelas</th>';
+            html += '<th class="border border-blue-300 p-3 text-center">Benar</th>';
+            html += '<th class="border border-blue-300 p-3 text-center">Salah</th>';
+            html += '<th class="border border-blue-300 p-3 text-center">Nilai</th>';
+            html += '<th class="border border-blue-300 p-3 text-center">Aksi</th>';
+            html += '</tr></thead><tbody>';
+
+            studentResults.forEach((result, index) => {
+                html += `<tr class="hover:bg-blue-50">`;
+                html += `<td class="border border-blue-300 p-3">${index + 1}</td>`;
+                html += `<td class="border border-blue-300 p-3">${result.name}</td>`;
+                html += `<td class="border border-blue-300 p-3">${result.class}</td>`;
+                html += `<td class="border border-blue-300 p-3 text-center">${result.correct}</td>`;
+                html += `<td class="border border-blue-300 p-3 text-center">${result.wrong}</td>`;
+                html += `<td class="border border-blue-300 p-3 text-center font-bold">${result.score}</td>`;
+                html += `<td class="border border-blue-300 p-3 text-center">`;
+                html += `<button onclick="showStudentDetail(${index})" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">Detail</button>`;
+                html += `</td></tr>`;
+            });
+
+            html += '</tbody></table></div></div>';
+            container.innerHTML = html;
+        }
+
+        function showStudentDetail(index) {
+            const result = studentResults[index];
+            let detailHtml = `<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onclick="closeStudentDetail()">`;
+            detailHtml += `<div class="bg-white rounded-lg p-6 max-w-4xl max-h-96 overflow-y-auto m-4" onclick="event.stopPropagation()">`;
+            detailHtml += `<div class="flex justify-between items-center mb-4">`;
+            detailHtml += `<h3 class="text-xl font-bold text-blue-800">Detail Jawaban - ${result.name}</h3>`;
+            detailHtml += `<button onclick="closeStudentDetail()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>`;
+            detailHtml += `</div>`;
+            
+            result.answers.forEach((answer, qIndex) => {
+                const question = questions[qIndex];
+                const isCorrect = answer === question.correct;
+                detailHtml += `<div class="mb-4 p-3 border rounded ${isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}">`;
+                detailHtml += `<p class="font-semibold mb-2">${qIndex + 1}. ${question.question}</p>`;
+                detailHtml += `<p class="text-sm">Jawaban siswa: <span class="${isCorrect ? 'text-green-600' : 'text-red-600'}">${question.options[answer]}</span></p>`;
+                if (!isCorrect) {
+                    detailHtml += `<p class="text-sm text-green-600">Jawaban benar: ${question.options[question.correct]}</p>`;
+                }
+                detailHtml += `</div>`;
+            });
+            
+            detailHtml += `</div></div>`;
+            
+            const modal = document.createElement('div');
+            modal.id = 'studentDetailModal';
+            modal.innerHTML = detailHtml;
+            document.body.appendChild(modal);
+        }
+
+        function closeStudentDetail() {
+            const modal = document.getElementById('studentDetailModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        function printResults() {
+            window.print();
+        }
+
+        // Student functions
+        function loginStudent() {
+            const name = document.getElementById('studentName').value.trim();
+            const studentClass = document.getElementById('studentClass').value;
+            
+            if (!name || !studentClass) {
+                showNotification('Mohon lengkapi nama dan kelas!', 'error');
+                return;
+            }
+            
+            currentUser = { type: 'student', name: name, class: studentClass };
+            document.getElementById('studentNameDisplay').textContent = name;
+            document.getElementById('studentClassDisplay').textContent = `Kelas ${studentClass}`;
+            
+            // Initialize exam
+            currentQuestionIndex = 0;
+            studentAnswers = [];
+            correctAnswers = 0;
+            wrongAnswers = 0;
+            timeLeft = 3600;
+            examFinished = false;
+            
+            showScreen('studentExam');
+            startTimer();
+            loadQuestion();
+            showNotification('Ujian dimulai! Semangat mengerjakan! 💪', 'success');
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    finishExam();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                finishExam();
+                return;
+            }
+            
+            const question = questions[currentQuestionIndex];
+            const container = document.getElementById('questionContainer');
+            
+            let html = `<div class="bg-white rounded-lg p-6 shadow-lg">`;
+            html += `<div class="mb-4">`;
+            html += `<span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mb-2">Level ${question.level}</span>`;
+            html += `<h3 class="text-lg font-semibold text-gray-800">${question.question}</h3>`;
+            html += `</div>`;
+            html += `<div class="space-y-3">`;
+            
+            question.options.forEach((option, index) => {
+                html += `<button onclick="selectAnswer(${index})" class="w-full text-left p-3 border border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition duration-300">`;
+                html += `<span class="font-semibold text-blue-600">${String.fromCharCode(65 + index)}.</span> ${option}`;
+                html += `</button>`;
+            });
+            
+            html += `</div></div>`;
+            container.innerHTML = html;
+            
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+        }
+
+        function selectAnswer(answerIndex) {
+            if (examFinished) return;
+            
+            const question = questions[currentQuestionIndex];
+            const isCorrect = answerIndex === question.correct;
+            
+            studentAnswers[currentQuestionIndex] = answerIndex;
+            
+            if (isCorrect) {
+                correctAnswers++;
+                showNotification('👍 Yeah, kamu menjawab dengan benar!', 'success');
+                document.getElementById('correctCount').textContent = correctAnswers;
+                
+                // Move to next question after delay
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    loadQuestion();
+                }, 1500);
+            } else {
+                wrongAnswers++;
+                showNotification('💪 Maaf, kamu belum berhasil, belajar lebih giat lagi ya!', 'error');
+                document.getElementById('wrongCount').textContent = wrongAnswers;
+                
+                // Lock the question - disable all buttons
+                const buttons = document.querySelectorAll('#questionContainer button');
+                buttons.forEach(button => {
+                    button.disabled = true;
+                    button.classList.add('opacity-50', 'cursor-not-allowed');
+                });
+                
+                // Move to next question after delay
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    loadQuestion();
+                }, 2000);
+            }
+        }
+
+        function finishExam() {
+            if (examFinished) return;
+            
+            examFinished = true;
+            clearInterval(timerInterval);
+            
+            // Calculate score
+            const score = Math.round((correctAnswers / questions.length) * 100);
+            
+            // Save result
+            const result = {
+                name: currentUser.name,
+                class: currentUser.class,
+                correct: correctAnswers,
+                wrong: wrongAnswers,
+                score: score,
+                answers: studentAnswers,
+                timestamp: new Date().toLocaleString('id-ID')
+            };
+            
+            studentResults.push(result);
+            localStorage.setItem('studentResults', JSON.stringify(studentResults));
+            
+            // Show result
+            const resultContainer = document.getElementById('finalResult');
+            let resultHtml = `<div class="text-center">`;
+            resultHtml += `<h3 class="text-xl font-bold text-blue-800 mb-4">Hasil Ujian Anda</h3>`;
+            resultHtml += `<div class="bg-blue-100 rounded-lg p-4 mb-4">`;
+            resultHtml += `<p class="text-lg"><strong>Nama:</strong> ${currentUser.name}</p>`;
+            resultHtml += `<p class="text-lg"><strong>Kelas:</strong> ${currentUser.class}</p>`;
+            resultHtml += `</div>`;
+            resultHtml += `<div class="grid grid-cols-3 gap-4 mb-4">`;
+            resultHtml += `<div class="bg-green-100 rounded-lg p-3">`;
+            resultHtml += `<p class="text-2xl font-bold text-green-600">${correctAnswers}</p>`;
+            resultHtml += `<p class="text-sm text-green-700">Benar</p>`;
+            resultHtml += `</div>`;
+            resultHtml += `<div class="bg-red-100 rounded-lg p-3">`;
+            resultHtml += `<p class="text-2xl font-bold text-red-600">${wrongAnswers}</p>`;
+            resultHtml += `<p class="text-sm text-red-700">Salah</p>`;
+            resultHtml += `</div>`;
+            resultHtml += `<div class="bg-blue-100 rounded-lg p-3">`;
+            resultHtml += `<p class="text-2xl font-bold text-blue-600">${score}</p>`;
+            resultHtml += `<p class="text-sm text-blue-700">Nilai</p>`;
+            resultHtml += `</div>`;
+            resultHtml += `</div>`;
+            
+            if (score >= 75) {
+                resultHtml += `<p class="text-green-600 font-semibold">🎉 Selamat! Anda lulus!</p>`;
+            } else {
+                resultHtml += `<p class="text-orange-600 font-semibold">📚 Terus belajar untuk hasil yang lebih baik!</p>`;
+            }
+            
+            resultHtml += `</div>`;
+            resultContainer.innerHTML = resultHtml;
+            
+            showScreen('studentResult');
+            showNotification('Ujian selesai! Terima kasih telah mengerjakan.', 'info');
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            showScreen('modeSelection');
+            
+            // Load existing results
+            studentResults = JSON.parse(localStorage.getItem('studentResults') || '[]');
+            
+            // Handle Enter key for password input
+            document.getElementById('teacherPassword').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    loginTeacher();
+                }
+            });
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96b25b8734913e49',t:'MTc1NDUyMzM5OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
