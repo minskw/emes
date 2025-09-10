@@ -411,14 +411,14 @@
         let currentTab = 'home';
 
         // Google Apps Script Configuration - Built-in
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbytF-j9hvm4x8YM44J_R2_r7Fa4OZcXgJw0eJO9nfUc1XYSkBbeJtuiMRte-4wE_W50Ng/exec';
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfx8AqFo-OdfV5IOp2Aebfw6P9-pM07-9E7mksrI2LsiSQTEO_MybP20qE5HbVAQDR_A/exec';
         
         let sheetsConfig = JSON.parse(localStorage.getItem('sheetsConfig')) || {
             url: GOOGLE_APPS_SCRIPT_URL,
             isConnected: false,
             lastSync: null,
-            autoSync: false, // Default to false to avoid CORS issues
-            offlineMode: true
+            autoSync: true, // Default to false to avoid CORS issues
+            offlineMode: false
         };
 
         // Sync status
