@@ -6,6 +6,7 @@
     <title>Kalkulator Nilai Siswa</title>
     <link rel="icon" type="image/x-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNGY0NmU1IiBkPSJNNDQ4IDMySDY0QzI4LjcgMzIgMCA2MC43IDAgOTZ2MzIwYzAgMzUuMyAyOC43IDY0IDY0IDY0aDM4NGMzNS4zIDAgNjQtMjguNyA2NC02NFY5NmMwLTM1LjMtMjguNy02NC02NC02NHptLTY0IDEyOEgxMjh2LTMyaDI1NnYzMnptMCA2NEgxMjh2LTMyaDI1NnYzMnptMCA2NEgxMjh2LTMyaDI1NnYzMnptMCA2NEgxMjh2LTMyaDI1NnYzMnoiLz48L3N2Zz4=">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         body {
@@ -850,7 +851,12 @@
             const skorMax = document.getElementById('skorMax').value;
             
             if (!namaUjian || !mataPelajaran || !kelas || !skorMax) {
-                alert('Mohon lengkapi identitas ujian terlebih dahulu!');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Data Belum Lengkap',
+                    text: 'Mohon lengkapi identitas ujian terlebih dahulu!',
+                    confirmButtonColor: '#4f46e5'
+                });
                 return;
             }
             
@@ -859,7 +865,12 @@
             const skorSiswa = document.getElementById('skorSiswa').value;
             
             if (!namaSiswa || !skorSiswa) {
-                alert('Mohon lengkapi nama siswa dan skor!');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Data Siswa Belum Lengkap',
+                    text: 'Mohon lengkapi nama siswa dan skor!',
+                    confirmButtonColor: '#4f46e5'
+                });
                 return;
             }
             
@@ -867,7 +878,12 @@
             const skorSiswaInt = parseInt(skorSiswa);
             
             if (skorSiswaInt > skorMaxInt) {
-                alert('Skor siswa tidak boleh lebih besar dari skor maksimal!');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Skor Tidak Valid',
+                    text: 'Skor siswa tidak boleh lebih besar dari skor maksimal!',
+                    confirmButtonColor: '#4f46e5'
+                });
                 return;
             }
             
@@ -900,7 +916,13 @@
             // Focus ke field nama siswa untuk input berikutnya
             document.getElementById('namaSiswa').focus();
             
-            alert('Data siswa berhasil disimpan!');
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Data siswa berhasil disimpan!',
+                timer: 1500,
+                showConfirmButton: false
+            });
         });
         
         // Simpan data ke localStorage
@@ -969,29 +991,71 @@
         
         // Hapus data individual
         window.hapusData = function(id) {
-            if (confirm('Yakin ingin menghapus data ini?')) {
-                dataNilai = dataNilai.filter(data => data.id !== id);
-                simpanData();
-                tampilkanData();
-                updateStatistik();
-            }
+            Swal.fire({
+                title: 'Hapus Data?',
+                text: 'Yakin ingin menghapus data ini?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    dataNilai = dataNilai.filter(data => data.id !== id);
+                    simpanData();
+                    tampilkanData();
+                    updateStatistik();
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Terhapus!',
+                        text: 'Data berhasil dihapus.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            });
         }
         
         // Hapus semua data
         window.hapusSemuaData = function() {
-            if (confirm('Yakin ingin menghapus SEMUA data? Tindakan ini tidak dapat dibatalkan!')) {
-                dataNilai = [];
-                simpanData();
-                tampilkanData();
-                updateStatistik();
-                alert('Semua data berhasil dihapus!');
-            }
+            Swal.fire({
+                title: 'Hapus Semua Data?',
+                text: 'Yakin ingin menghapus SEMUA data? Tindakan ini tidak dapat dibatalkan!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, Hapus Semua!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    dataNilai = [];
+                    simpanData();
+                    tampilkanData();
+                    updateStatistik();
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Semua data berhasil dihapus!',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
         }
         
         // Print Data
         window.printData = function() {
             if (dataNilai.length === 0) {
-                alert('Tidak ada data untuk dicetak!');
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Tidak Ada Data',
+                    text: 'Tidak ada data untuk dicetak!',
+                    confirmButtonColor: '#4f46e5'
+                });
                 return;
             }
             
@@ -1120,7 +1184,12 @@
         // Ekspor ke Excel - Implementasi manual tanpa library eksternal
         window.eksporExcel = function() {
             if (dataNilai.length === 0) {
-                alert('Tidak ada data untuk diekspor!');
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Tidak Ada Data',
+                    text: 'Tidak ada data untuk diekspor!',
+                    confirmButtonColor: '#4f46e5'
+                });
                 return;
             }
             
@@ -1172,7 +1241,12 @@
                     link.click();
                     document.body.removeChild(link);
                     
-                    alert('Data berhasil diekspor! File CSV dapat dibuka dengan Excel.');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Data berhasil diekspor! File CSV dapat dibuka dengan Excel.',
+                        confirmButtonColor: '#4f46e5'
+                    });
                 } else {
                     // Fallback untuk browser lama
                     const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
@@ -1181,7 +1255,12 @@
                 
             } catch (error) {
                 console.error('Error saat ekspor:', error);
-                alert('Terjadi kesalahan saat mengekspor data.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Ekspor',
+                    text: 'Terjadi kesalahan saat mengekspor data.',
+                    confirmButtonColor: '#4f46e5'
+                });
             }
         }
         
@@ -1288,8 +1367,14 @@
             const skorMax = document.getElementById('skorMaxMobile').value;
             
             if (!namaUjian || !mataPelajaran || !kelas || !skorMax) {
-                alert('Mohon lengkapi identitas ujian terlebih dahulu!');
-                showMobileSection('setup');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Data Belum Lengkap',
+                    text: 'Mohon lengkapi identitas ujian terlebih dahulu!',
+                    confirmButtonColor: '#4f46e5'
+                }).then(() => {
+                    showMobileSection('setup');
+                });
                 return;
             }
             
@@ -1298,7 +1383,12 @@
             const skorSiswa = document.getElementById('skorSiswaMobile').value;
             
             if (!namaSiswa || !skorSiswa) {
-                alert('Mohon lengkapi nama siswa dan skor!');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Data Siswa Belum Lengkap',
+                    text: 'Mohon lengkapi nama siswa dan skor!',
+                    confirmButtonColor: '#4f46e5'
+                });
                 return;
             }
             
@@ -1306,7 +1396,12 @@
             const skorSiswaInt = parseInt(skorSiswa);
             
             if (skorSiswaInt > skorMaxInt) {
-                alert('Skor siswa tidak boleh lebih besar dari skor maksimal!');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Skor Tidak Valid',
+                    text: 'Skor siswa tidak boleh lebih besar dari skor maksimal!',
+                    confirmButtonColor: '#4f46e5'
+                });
                 return;
             }
             
@@ -1339,7 +1434,13 @@
             // Focus ke field nama siswa untuk input berikutnya
             document.getElementById('namaSiswaMobile').focus();
             
-            alert('Data siswa berhasil disimpan!');
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Data siswa berhasil disimpan!',
+                timer: 1500,
+                showConfirmButton: false
+            });
         });
         
         // Update mobile table display
@@ -1404,5 +1505,5 @@
             updateSubtitle();
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'984785c65639ce46',t:'MTc1ODc3MTg2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98478e84e21dcb36',t:'MTc1ODc3MjIyMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
