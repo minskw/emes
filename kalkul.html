@@ -489,6 +489,8 @@
             <p id="headerSubtitle">Kelola dan hitung nilai siswa dengan mudah</p>
         </div>
         
+
+        
         <div class="content">
             <!-- Desktop View - All sections visible -->
             <div class="desktop-view">
@@ -527,6 +529,12 @@
                         <i class="fas fa-edit"></i> Input Data Siswa
                     </div>
                     
+                    <!-- Nilai Display - Desktop Input Section -->
+                    <div class="nilai-display" id="nilaiDisplay" style="margin-bottom: 20px;">
+                        <div style="font-size: 1rem; margin-bottom: 5px; opacity: 0.8;">NILAI</div>
+                        <div style="font-size: 3rem; font-weight: 900; line-height: 1;">-</div>
+                    </div>
+                    
                     <form id="nilaiForm">
                         <div class="form-grid">
                             <div class="form-group">
@@ -538,11 +546,6 @@
                                 <label for="skorSiswa">Skor Siswa</label>
                                 <input type="number" id="skorSiswa" required min="0" placeholder="85">
                             </div>
-                        </div>
-                        
-                        <div class="nilai-display" id="nilaiDisplay">
-                            <div style="font-size: 1rem; margin-bottom: 5px; opacity: 0.8;">NILAI</div>
-                            <div style="font-size: 3rem; font-weight: 900; line-height: 1;">-</div>
                         </div>
                         
                         <button type="submit" class="btn btn-primary">
@@ -649,6 +652,12 @@
 
                 <!-- Input Section -->
                 <div class="mobile-section" id="inputSection">
+                    <!-- Nilai Display - Mobile Input Section -->
+                    <div class="nilai-display" id="nilaiDisplayMobileInput" style="margin-bottom: 20px;">
+                        <div style="font-size: 1rem; margin-bottom: 5px; opacity: 0.8;">NILAI</div>
+                        <div style="font-size: 3rem; font-weight: 900; line-height: 1;">-</div>
+                    </div>
+                    
                     <div class="form-section">
                         <div class="form-title">
                             <i class="fas fa-edit"></i> Input Data Siswa
@@ -665,11 +674,6 @@
                                     <label for="skorSiswaMobile">Skor Siswa</label>
                                     <input type="number" id="skorSiswaMobile" required min="0" placeholder="85">
                                 </div>
-                            </div>
-                            
-                            <div class="nilai-display" id="nilaiDisplayMobile">
-                                <div style="font-size: 1rem; margin-bottom: 5px; opacity: 0.8;">NILAI</div>
-                                <div style="font-size: 3rem; font-weight: 900; line-height: 1;">-</div>
                             </div>
                             
                             <button type="submit" class="btn btn-primary">
@@ -1327,7 +1331,7 @@
         function updateNilaiDisplayMobile() {
             const skorMax = document.getElementById('skorMaxMobile').value;
             const skorSiswa = document.getElementById('skorSiswaMobile').value;
-            const nilaiDisplay = document.getElementById('nilaiDisplayMobile');
+            const nilaiDisplay = document.getElementById('nilaiDisplayMobileInput');
             
             if (skorMax && skorSiswa) {
                 const nilai = hitungNilai(parseInt(skorSiswa), parseInt(skorMax));
@@ -1505,5 +1509,5 @@
             updateSubtitle();
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98478e84e21dcb36',t:'MTc1ODc3MjIyMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98479a6994dcfda7',t:'MTc1ODc3MjcwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
