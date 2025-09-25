@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Nilai Siswa</title>
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNGY0NmU1IiBkPSJNNDQ4IDMySDY0QzI4LjcgMzIgMCA2MC43IDAgOTZ2MzIwYzAgMzUuMyAyOC43IDY0IDY0IDY0aDM4NGMzNS4zIDAgNjQtMjguNyA2NC02NFY5NmMwLTM1LjMtMjguNy02NC02NC02NHptLTY0IDEyOEgxMjh2LTMyaDI1NnYzMnptMCA2NEgxMjh2LTMyaDI1NnYzMnptMCA2NEgxMjh2LTMyaDI1NnYzMnptMCA2NEgxMjh2LTMyaDI1NnYzMnoiLz48L3N2Zz4=">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .form-section {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .form-group input, .form-group select {
+            padding: 12px 16px;
+            border: 2px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        .nilai-display {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-info {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+        }
+        
+        .btn-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(6, 182, 212, 0.3);
+        }
+        
+        .data-section {
+            background: white;
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+            overflow: hidden;
+        }
+        
+        .data-header {
+            background: #f1f5f9;
+            padding: 20px 25px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .data-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .data-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            max-height: 500px;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background: #4f46e5;
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .data-table tr:hover {
+            background: #f8fafc;
+        }
+        
+        .nilai-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .nilai-a { background: #dcfce7; color: #166534; }
+        .nilai-b { background: #dbeafe; color: #1e40af; }
+        .nilai-c { background: #fef3c7; color: #92400e; }
+        .nilai-d { background: #fee2e2; color: #991b1b; }
+        
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+        
+        .delete-btn:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #4f46e5;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+        
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        /* Mobile Navigation */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 2px solid #e2e8f0;
+            padding: 10px 0;
+            z-index: 1000;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .mobile-nav-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #64748b;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .mobile-nav-item.active {
+            background: #4f46e5;
+            color: white;
+        }
+        
+        .mobile-nav-item:hover {
+            background: #f1f5f9;
+            color: #4f46e5;
+        }
+        
+        .mobile-nav-item.active:hover {
+            background: #4f46e5;
+            color: white;
+        }
+        
+        .mobile-nav-icon {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+        
+        .mobile-section {
+            display: none;
+        }
+        
+        .mobile-section.active {
+            display: block;
+        }
+        
+        .desktop-view {
+            display: block;
+        }
+        
+        .mobile-view {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-bottom: 80px;
+            }
+            
+            .desktop-view {
+                display: none;
+            }
+            
+            .mobile-view {
+                display: block;
+            }
+            
+            .mobile-nav {
+                display: block;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .data-actions {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .form-section {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .stat-card {
+                padding: 15px;
+            }
+            
+            .stat-number {
+                font-size: 1.5rem;
+            }
+            
+            .table-container {
+                font-size: 0.9rem;
+            }
+            
+            .data-table th,
+            .data-table td {
+                padding: 8px 6px;
+            }
+            
+            .btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-calculator"></i> Kalkulator Nilai Siswa</h1>
+            <p id="headerSubtitle">Kelola dan hitung nilai siswa dengan mudah</p>
+        </div>
+        
+        <div class="content">
+            <!-- Desktop View - All sections visible -->
+            <div class="desktop-view">
+                <!-- Form Identitas Ujian -->
+                <div class="form-section">
+                    <div class="form-title">
+                        <i class="fas fa-clipboard-list"></i> Identitas Ujian
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="namaUjian">Nama Ujian</label>
+                            <input type="text" id="namaUjian" required placeholder="Contoh: Ulangan Harian Matematika">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="mataPelajaran">Mata Pelajaran</label>
+                            <input type="text" id="mataPelajaran" required placeholder="Contoh: Matematika">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="kelas">Kelas</label>
+                            <input type="text" id="kelas" required placeholder="Contoh: XII IPA 1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="skorMax">Skor Maksimal</label>
+                            <input type="number" id="skorMax" required min="1" placeholder="100">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Input Siswa -->
+                <div class="form-section">
+                    <div class="form-title">
+                        <i class="fas fa-edit"></i> Input Data Siswa
+                    </div>
+                    
+                    <form id="nilaiForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="namaSiswa">Nama Siswa</label>
+                                <input type="text" id="namaSiswa" required placeholder="Masukkan nama siswa">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="skorSiswa">Skor Siswa</label>
+                                <input type="number" id="skorSiswa" required min="0" placeholder="85">
+                            </div>
+                        </div>
+                        
+                        <div class="nilai-display" id="nilaiDisplay">
+                            Nilai: -
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Simpan Data Siswa
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Statistik -->
+                <div class="stats" id="statsContainer">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalSiswa">0</div>
+                        <div class="stat-label">Total Siswa</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="rataRata">0</div>
+                        <div class="stat-label">Rata-rata Nilai</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="nilaiTertinggi">0</div>
+                        <div class="stat-label">Nilai Tertinggi</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="nilaiTerendah">0</div>
+                        <div class="stat-label">Nilai Terendah</div>
+                    </div>
+                </div>
+                
+                <!-- Data Table -->
+                <div class="data-section">
+                    <div class="data-header">
+                        <div class="data-title"><i class="fas fa-table"></i> Data Nilai Siswa</div>
+                        <div class="data-actions">
+                            <button class="btn btn-success" onclick="eksporExcel()">
+                                <i class="fas fa-file-excel"></i> Ekspor Excel
+                            </button>
+                            <button class="btn btn-info" onclick="printData()">
+                                <i class="fas fa-print"></i> Print
+                            </button>
+                            <button class="btn btn-danger" onclick="hapusSemuaData()">
+                                <i class="fas fa-trash"></i> Hapus Semua
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="data-table" id="dataTable">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Siswa</th>
+                                    <th>Skor</th>
+                                    <th>Nilai</th>
+                                    <th>Grade</th>
+                                    <th>Ketuntasan</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataTableBody">
+                            </tbody>
+                        </table>
+                        
+                        <div class="empty-state" id="emptyState">
+                            <div class="empty-state-icon"><i class="fas fa-clipboard-list"></i></div>
+                            <h3>Belum ada data nilai</h3>
+                            <p>Mulai tambahkan data siswa menggunakan form di atas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile View - Sectioned content -->
+            <div class="mobile-view">
+                <!-- Setup Section -->
+                <div class="mobile-section active" id="setupSection">
+                    <div class="form-section">
+                        <div class="form-title">
+                            <i class="fas fa-clipboard-list"></i> Identitas Ujian
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="namaUjianMobile">Nama Ujian</label>
+                                <input type="text" id="namaUjianMobile" required placeholder="Contoh: Ulangan Harian Matematika">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="mataPelajaranMobile">Mata Pelajaran</label>
+                                <input type="text" id="mataPelajaranMobile" required placeholder="Contoh: Matematika">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="kelasMobile">Kelas</label>
+                                <input type="text" id="kelasMobile" required placeholder="Contoh: XII IPA 1">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="skorMaxMobile">Skor Maksimal</label>
+                                <input type="number" id="skorMaxMobile" required min="1" placeholder="100">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Section -->
+                <div class="mobile-section" id="inputSection">
+                    <div class="form-section">
+                        <div class="form-title">
+                            <i class="fas fa-edit"></i> Input Data Siswa
+                        </div>
+                        
+                        <form id="nilaiFormMobile">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="namaSiswaMobile">Nama Siswa</label>
+                                    <input type="text" id="namaSiswaMobile" required placeholder="Masukkan nama siswa">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="skorSiswaMobile">Skor Siswa</label>
+                                    <input type="number" id="skorSiswaMobile" required min="0" placeholder="85">
+                                </div>
+                            </div>
+                            
+                            <div class="nilai-display" id="nilaiDisplayMobile">
+                                Nilai: -
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Simpan Data Siswa
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Stats Section -->
+                <div class="mobile-section" id="statsSection">
+                    <div class="stats" id="statsContainerMobile">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalSiswaMobile">0</div>
+                            <div class="stat-label">Total Siswa</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="rataRataMobile">0</div>
+                            <div class="stat-label">Rata-rata Nilai</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="nilaiTertinggiMobile">0</div>
+                            <div class="stat-label">Nilai Tertinggi</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="nilaiTerendahMobile">0</div>
+                            <div class="stat-label">Nilai Terendah</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Section -->
+                <div class="mobile-section" id="dataSection">
+                    <div class="data-section">
+                        <div class="data-header">
+                            <div class="data-title"><i class="fas fa-table"></i> Data Nilai</div>
+                            <div class="data-actions">
+                                <button class="btn btn-success" onclick="eksporExcel()">
+                                    <i class="fas fa-file-excel"></i> Excel
+                                </button>
+                                <button class="btn btn-info" onclick="printData()">
+                                    <i class="fas fa-print"></i> Print
+                                </button>
+                                <button class="btn btn-danger" onclick="hapusSemuaData()">
+                                    <i class="fas fa-trash"></i> Hapus
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table class="data-table" id="dataTableMobile">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama</th>
+                                        <th>Skor</th>
+                                        <th>Nilai</th>
+                                        <th>Grade</th>
+                                        <th>Status</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dataTableBodyMobile">
+                                </tbody>
+                            </table>
+                            
+                            <div class="empty-state" id="emptyStateMobile">
+                                <div class="empty-state-icon"><i class="fas fa-clipboard-list"></i></div>
+                                <h3>Belum ada data nilai</h3>
+                                <p>Mulai tambahkan data siswa</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div class="mobile-nav">
+            <div class="mobile-nav-container">
+                <div class="mobile-nav-item active" onclick="showMobileSection('setup')">
+                    <div class="mobile-nav-icon"><i class="fas fa-cog"></i></div>
+                    <div>Setup</div>
+                </div>
+                <div class="mobile-nav-item" onclick="showMobileSection('input')">
+                    <div class="mobile-nav-icon"><i class="fas fa-edit"></i></div>
+                    <div>Input</div>
+                </div>
+                <div class="mobile-nav-item" onclick="showMobileSection('stats')">
+                    <div class="mobile-nav-icon"><i class="fas fa-chart-bar"></i></div>
+                    <div>Statistik</div>
+                </div>
+                <div class="mobile-nav-item" onclick="showMobileSection('data')">
+                    <div class="mobile-nav-icon"><i class="fas fa-table"></i></div>
+                    <div>Data</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let dataNilai = JSON.parse(localStorage.getItem('dataNilai')) || [];
+        
+        // Hitung nilai berdasarkan skor
+        function hitungNilai(skorSiswa, skorMax) {
+            return Math.round((skorSiswa / skorMax) * 100);
+        }
+        
+        // Tentukan grade berdasarkan nilai
+        function tentukanGrade(nilai) {
+            if (nilai >= 85) return 'A';
+            if (nilai >= 70) return 'B';
+            if (nilai >= 60) return 'C';
+            return 'D';
+        }
+        
+        // Update tampilan nilai real-time
+        function updateNilaiDisplay() {
+            const skorMax = document.getElementById('skorMax').value;
+            const skorSiswa = document.getElementById('skorSiswa').value;
+            const nilaiDisplay = document.getElementById('nilaiDisplay');
+            
+            if (skorMax && skorSiswa) {
+                const nilai = hitungNilai(parseInt(skorSiswa), parseInt(skorMax));
+                const grade = tentukanGrade(nilai);
+                nilaiDisplay.textContent = `Nilai: ${nilai} (Grade ${grade})`;
+            } else {
+                nilaiDisplay.textContent = 'Nilai: -';
+            }
+        }
+        
+        // Update subtitle dinamis
+        function updateSubtitle() {
+            const namaUjian = document.getElementById('namaUjian').value.trim();
+            const kelas = document.getElementById('kelas').value.trim();
+            const subtitle = document.getElementById('headerSubtitle');
+            
+            if (namaUjian && kelas) {
+                subtitle.textContent = `${namaUjian} - ${kelas}`;
+            } else if (namaUjian) {
+                subtitle.textContent = namaUjian;
+            } else {
+                subtitle.textContent = 'Kelola dan hitung nilai siswa dengan mudah';
+            }
+        }
+        
+        // Event listeners untuk update real-time
+        document.getElementById('skorMax').addEventListener('input', updateNilaiDisplay);
+        document.getElementById('skorSiswa').addEventListener('input', updateNilaiDisplay);
+        document.getElementById('namaUjian').addEventListener('input', updateSubtitle);
+        document.getElementById('kelas').addEventListener('input', updateSubtitle);
+        
+        // Handle form submission
+        document.getElementById('nilaiForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validasi identitas ujian
+            const namaUjian = document.getElementById('namaUjian').value.trim();
+            const mataPelajaran = document.getElementById('mataPelajaran').value.trim();
+            const kelas = document.getElementById('kelas').value.trim();
+            const skorMax = document.getElementById('skorMax').value;
+            
+            if (!namaUjian || !mataPelajaran || !kelas || !skorMax) {
+                alert('Mohon lengkapi identitas ujian terlebih dahulu!');
+                return;
+            }
+            
+            // Data siswa
+            const namaSiswa = document.getElementById('namaSiswa').value.trim();
+            const skorSiswa = document.getElementById('skorSiswa').value;
+            
+            if (!namaSiswa || !skorSiswa) {
+                alert('Mohon lengkapi nama siswa dan skor!');
+                return;
+            }
+            
+            const skorMaxInt = parseInt(skorMax);
+            const skorSiswaInt = parseInt(skorSiswa);
+            
+            if (skorSiswaInt > skorMaxInt) {
+                alert('Skor siswa tidak boleh lebih besar dari skor maksimal!');
+                return;
+            }
+            
+            const nilai = hitungNilai(skorSiswaInt, skorMaxInt);
+            const grade = tentukanGrade(nilai);
+            
+            const dataBaru = {
+                id: Date.now(),
+                namaUjian,
+                mataPelajaran,
+                namaSiswa,
+                kelas,
+                skorMax: skorMaxInt,
+                skorSiswa: skorSiswaInt,
+                nilai,
+                grade,
+                tanggal: new Date().toLocaleDateString('id-ID')
+            };
+            
+            dataNilai.push(dataBaru);
+            simpanData();
+            tampilkanData();
+            updateStatistik();
+            
+            // Reset hanya field nama siswa dan skor
+            document.getElementById('namaSiswa').value = '';
+            document.getElementById('skorSiswa').value = '';
+            updateNilaiDisplay();
+            
+            // Focus ke field nama siswa untuk input berikutnya
+            document.getElementById('namaSiswa').focus();
+            
+            alert('Data siswa berhasil disimpan!');
+        });
+        
+        // Simpan data ke localStorage
+        function simpanData() {
+            localStorage.setItem('dataNilai', JSON.stringify(dataNilai));
+        }
+        
+        // Tampilkan data dalam tabel
+        function tampilkanData() {
+            const tbody = document.getElementById('dataTableBody');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (dataNilai.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            tbody.innerHTML = dataNilai.map((data, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td><strong>${data.namaSiswa}</strong></td>
+                    <td>${data.skorSiswa}/${data.skorMax}</td>
+                    <td><strong>${data.nilai}</strong></td>
+                    <td><span class="nilai-badge nilai-${data.grade.toLowerCase()}">${data.grade}</span></td>
+                    <td><span class="nilai-badge ${data.nilai >= 70 ? 'nilai-a' : 'nilai-d'}">${data.nilai >= 70 ? 'Tuntas' : 'Remedi'}</span></td>
+                    <td>
+                        <button class="delete-btn" onclick="hapusData(${data.id})">
+                            <i class="fas fa-trash"></i> Hapus
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // Update mobile table too
+            tampilkanDataMobile();
+        }
+        
+        // Update statistik
+        function updateStatistik() {
+            const totalSiswa = dataNilai.length;
+            
+            if (totalSiswa === 0) {
+                document.getElementById('totalSiswa').textContent = '0';
+                document.getElementById('rataRata').textContent = '0';
+                document.getElementById('nilaiTertinggi').textContent = '0';
+                document.getElementById('nilaiTerendah').textContent = '0';
+                return;
+            }
+            
+            const nilaiArray = dataNilai.map(data => data.nilai);
+            const rataRata = Math.round(nilaiArray.reduce((a, b) => a + b, 0) / totalSiswa);
+            const nilaiTertinggi = Math.max(...nilaiArray);
+            const nilaiTerendah = Math.min(...nilaiArray);
+            
+            document.getElementById('totalSiswa').textContent = totalSiswa;
+            document.getElementById('rataRata').textContent = rataRata;
+            document.getElementById('nilaiTertinggi').textContent = nilaiTertinggi;
+            document.getElementById('nilaiTerendah').textContent = nilaiTerendah;
+            
+            // Update mobile stats too
+            updateStatistikMobile();
+        }
+        
+        // Hapus data individual
+        window.hapusData = function(id) {
+            if (confirm('Yakin ingin menghapus data ini?')) {
+                dataNilai = dataNilai.filter(data => data.id !== id);
+                simpanData();
+                tampilkanData();
+                updateStatistik();
+            }
+        }
+        
+        // Hapus semua data
+        window.hapusSemuaData = function() {
+            if (confirm('Yakin ingin menghapus SEMUA data? Tindakan ini tidak dapat dibatalkan!')) {
+                dataNilai = [];
+                simpanData();
+                tampilkanData();
+                updateStatistik();
+                alert('Semua data berhasil dihapus!');
+            }
+        }
+        
+        // Print Data
+        window.printData = function() {
+            if (dataNilai.length === 0) {
+                alert('Tidak ada data untuk dicetak!');
+                return;
+            }
+            
+            // Hitung statistik
+            const totalSiswa = dataNilai.length;
+            const nilaiArray = dataNilai.map(data => data.nilai);
+            const rataRata = Math.round(nilaiArray.reduce((a, b) => a + b, 0) / totalSiswa);
+            const nilaiTertinggi = Math.max(...nilaiArray);
+            const nilaiTerendah = Math.min(...nilaiArray);
+            
+            // Buat konten untuk print
+            const printContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Data Nilai Siswa</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        .header { text-align: center; margin-bottom: 30px; }
+                        .info { margin-bottom: 20px; }
+                        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #4f46e5; color: white; }
+                        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px; }
+                        .stat-box { border: 1px solid #ddd; padding: 15px; text-align: center; }
+                        .stat-number { font-size: 1.5rem; font-weight: bold; color: #4f46e5; }
+                        .nilai-a { background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 10px; }
+                        .nilai-b { background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 10px; }
+                        .nilai-c { background: #fef3c7; color: #92400e; padding: 4px 8px; border-radius: 10px; }
+                        .nilai-d { background: #fee2e2; color: #991b1b; padding: 4px 8px; border-radius: 10px; }
+                        @media print {
+                            body { margin: 0; }
+                            .no-print { display: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>📊 Data Nilai Siswa</h1>
+                        <p>Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')}</p>
+                    </div>
+                    
+                    <div class="info">
+                        <p><strong>Nama Ujian:</strong> ${dataNilai[0]?.namaUjian || '-'}</p>
+                        <p><strong>Mata Pelajaran:</strong> ${dataNilai[0]?.mataPelajaran || '-'}</p>
+                        <p><strong>Kelas:</strong> ${dataNilai[0]?.kelas || '-'}</p>
+                        <p><strong>Skor Maksimal:</strong> ${dataNilai[0]?.skorMax || '-'}</p>
+                    </div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Siswa</th>
+                                <th>Skor</th>
+                                <th>Nilai</th>
+                                <th>Grade</th>
+                                <th>Ketuntasan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${dataNilai.map((data, index) => `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${data.namaSiswa}</td>
+                                    <td>${data.skorSiswa}/${data.skorMax}</td>
+                                    <td><strong>${data.nilai}</strong></td>
+                                    <td><span class="nilai-${data.grade.toLowerCase()}">${data.grade}</span></td>
+                                    <td><span class="nilai-${data.nilai >= 70 ? 'a' : 'd'}">${data.nilai >= 70 ? 'Tuntas' : 'Remedi'}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <div class="stats">
+                        <div class="stat-box">
+                            <div class="stat-number">${totalSiswa}</div>
+                            <div>Total Siswa</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number">${rataRata}</div>
+                            <div>Rata-rata Nilai</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number">${nilaiTertinggi}</div>
+                            <div>Nilai Tertinggi</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number">${nilaiTerendah}</div>
+                            <div>Nilai Terendah</div>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            // Buka jendela print
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            printWindow.focus();
+            
+            // Tunggu sebentar agar konten dimuat, lalu tampilkan dialog print
+            setTimeout(() => {
+                printWindow.print();
+            }, 500);
+        }
+        
+        // Ekspor ke Excel - Implementasi manual tanpa library eksternal
+        window.eksporExcel = function() {
+            if (dataNilai.length === 0) {
+                alert('Tidak ada data untuk diekspor!');
+                return;
+            }
+            
+            try {
+                // Hitung statistik
+                const totalSiswa = dataNilai.length;
+                const nilaiArray = dataNilai.map(data => data.nilai);
+                const rataRata = Math.round(nilaiArray.reduce((a, b) => a + b, 0) / totalSiswa);
+                const nilaiTertinggi = Math.max(...nilaiArray);
+                const nilaiTerendah = Math.min(...nilaiArray);
+                
+                // Buat konten CSV yang kompatibel dengan Excel
+                let csvContent = '\uFEFF'; // BOM untuk UTF-8
+                
+                // Header informasi
+                csvContent += `Data Nilai Siswa\n`;
+                csvContent += `Tanggal Ekspor: ${new Date().toLocaleDateString('id-ID')}\n`;
+                csvContent += `Nama Ujian: ${dataNilai[0]?.namaUjian || '-'}\n`;
+                csvContent += `Mata Pelajaran: ${dataNilai[0]?.mataPelajaran || '-'}\n`;
+                csvContent += `Kelas: ${dataNilai[0]?.kelas || '-'}\n`;
+                csvContent += `Skor Maksimal: ${dataNilai[0]?.skorMax || '-'}\n\n`;
+                
+                // Header tabel
+                csvContent += 'No,Nama Siswa,Skor Siswa,Skor Maksimal,Nilai,Grade,Ketuntasan,Tanggal Input\n';
+                
+                // Data siswa
+                dataNilai.forEach((data, index) => {
+                    const ketuntasan = data.nilai >= 70 ? 'Tuntas' : 'Remedi';
+                    csvContent += `${index + 1},"${data.namaSiswa}",${data.skorSiswa},${data.skorMax},${data.nilai},${data.grade},"${ketuntasan}","${data.tanggal}"\n`;
+                });
+                
+                // Statistik
+                csvContent += '\nSTATISTIK\n';
+                csvContent += `Total Siswa,${totalSiswa}\n`;
+                csvContent += `Rata-rata Nilai,${rataRata}\n`;
+                csvContent += `Nilai Tertinggi,${nilaiTertinggi}\n`;
+                csvContent += `Nilai Terendah,${nilaiTerendah}\n`;
+                
+                // Buat dan download file
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                
+                if (link.download !== undefined) {
+                    const url = URL.createObjectURL(blob);
+                    link.setAttribute('href', url);
+                    link.setAttribute('download', `Data_Nilai_Siswa_${new Date().toLocaleDateString('id-ID').replace(/\//g, '-')}.csv`);
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    alert('Data berhasil diekspor! File CSV dapat dibuka dengan Excel.');
+                } else {
+                    // Fallback untuk browser lama
+                    const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
+                    window.open(dataUri, '_blank');
+                }
+                
+            } catch (error) {
+                console.error('Error saat ekspor:', error);
+                alert('Terjadi kesalahan saat mengekspor data.');
+            }
+        }
+        
+        // Mobile Navigation Functions
+        window.showMobileSection = function(section) {
+            // Hide all sections
+            document.querySelectorAll('.mobile-section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+            
+            // Remove active from all nav items
+            document.querySelectorAll('.mobile-nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(section + 'Section').classList.add('active');
+            
+            // Add active to clicked nav item
+            document.querySelector(`.mobile-nav-item[onclick*="${section}"]`).classList.add('active');
+        }
+        
+        // Sync mobile and desktop forms
+        function syncForms() {
+            // Sync desktop to mobile
+            document.getElementById('namaUjianMobile').value = document.getElementById('namaUjian').value;
+            document.getElementById('mataPelajaranMobile').value = document.getElementById('mataPelajaran').value;
+            document.getElementById('kelasMobile').value = document.getElementById('kelas').value;
+            document.getElementById('skorMaxMobile').value = document.getElementById('skorMax').value;
+            
+            // Sync mobile to desktop
+            document.getElementById('namaUjian').value = document.getElementById('namaUjianMobile').value;
+            document.getElementById('mataPelajaran').value = document.getElementById('mataPelajaranMobile').value;
+            document.getElementById('kelas').value = document.getElementById('kelasMobile').value;
+            document.getElementById('skorMax').value = document.getElementById('skorMaxMobile').value;
+        }
+        
+        // Add event listeners for form sync
+        document.addEventListener('DOMContentLoaded', function() {
+            // Desktop form sync
+            ['namaUjian', 'mataPelajaran', 'kelas', 'skorMax'].forEach(id => {
+                document.getElementById(id).addEventListener('input', function() {
+                    document.getElementById(id + 'Mobile').value = this.value;
+                });
+            });
+            
+            // Mobile form sync
+            ['namaUjianMobile', 'mataPelajaranMobile', 'kelasMobile', 'skorMaxMobile'].forEach(id => {
+                document.getElementById(id).addEventListener('input', function() {
+                    const desktopId = id.replace('Mobile', '');
+                    document.getElementById(desktopId).value = this.value;
+                    if (id === 'namaUjianMobile' || id === 'kelasMobile') {
+                        updateSubtitle();
+                    }
+                });
+            });
+            
+            // Mobile input form sync
+            document.getElementById('skorMaxMobile').addEventListener('input', updateNilaiDisplayMobile);
+            document.getElementById('skorSiswaMobile').addEventListener('input', updateNilaiDisplayMobile);
+        });
+        
+        // Update mobile nilai display
+        function updateNilaiDisplayMobile() {
+            const skorMax = document.getElementById('skorMaxMobile').value;
+            const skorSiswa = document.getElementById('skorSiswaMobile').value;
+            const nilaiDisplay = document.getElementById('nilaiDisplayMobile');
+            
+            if (skorMax && skorSiswa) {
+                const nilai = hitungNilai(parseInt(skorSiswa), parseInt(skorMax));
+                const grade = tentukanGrade(nilai);
+                nilaiDisplay.textContent = `Nilai: ${nilai} (Grade ${grade})`;
+            } else {
+                nilaiDisplay.textContent = 'Nilai: -';
+            }
+        }
+        
+        // Handle mobile form submission
+        document.getElementById('nilaiFormMobile').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validasi identitas ujian
+            const namaUjian = document.getElementById('namaUjianMobile').value.trim();
+            const mataPelajaran = document.getElementById('mataPelajaranMobile').value.trim();
+            const kelas = document.getElementById('kelasMobile').value.trim();
+            const skorMax = document.getElementById('skorMaxMobile').value;
+            
+            if (!namaUjian || !mataPelajaran || !kelas || !skorMax) {
+                alert('Mohon lengkapi identitas ujian terlebih dahulu!');
+                showMobileSection('setup');
+                return;
+            }
+            
+            // Data siswa
+            const namaSiswa = document.getElementById('namaSiswaMobile').value.trim();
+            const skorSiswa = document.getElementById('skorSiswaMobile').value;
+            
+            if (!namaSiswa || !skorSiswa) {
+                alert('Mohon lengkapi nama siswa dan skor!');
+                return;
+            }
+            
+            const skorMaxInt = parseInt(skorMax);
+            const skorSiswaInt = parseInt(skorSiswa);
+            
+            if (skorSiswaInt > skorMaxInt) {
+                alert('Skor siswa tidak boleh lebih besar dari skor maksimal!');
+                return;
+            }
+            
+            const nilai = hitungNilai(skorSiswaInt, skorMaxInt);
+            const grade = tentukanGrade(nilai);
+            
+            const dataBaru = {
+                id: Date.now(),
+                namaUjian,
+                mataPelajaran,
+                namaSiswa,
+                kelas,
+                skorMax: skorMaxInt,
+                skorSiswa: skorSiswaInt,
+                nilai,
+                grade,
+                tanggal: new Date().toLocaleDateString('id-ID')
+            };
+            
+            dataNilai.push(dataBaru);
+            simpanData();
+            tampilkanData();
+            updateStatistik();
+            
+            // Reset hanya field nama siswa dan skor
+            document.getElementById('namaSiswaMobile').value = '';
+            document.getElementById('skorSiswaMobile').value = '';
+            updateNilaiDisplayMobile();
+            
+            // Focus ke field nama siswa untuk input berikutnya
+            document.getElementById('namaSiswaMobile').focus();
+            
+            alert('Data siswa berhasil disimpan!');
+        });
+        
+        // Update mobile table display
+        function tampilkanDataMobile() {
+            const tbody = document.getElementById('dataTableBodyMobile');
+            const emptyState = document.getElementById('emptyStateMobile');
+            
+            if (dataNilai.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            tbody.innerHTML = dataNilai.map((data, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td><strong>${data.namaSiswa}</strong></td>
+                    <td>${data.skorSiswa}/${data.skorMax}</td>
+                    <td><strong>${data.nilai}</strong></td>
+                    <td><span class="nilai-badge nilai-${data.grade.toLowerCase()}">${data.grade}</span></td>
+                    <td><span class="nilai-badge ${data.nilai >= 70 ? 'nilai-a' : 'nilai-d'}">${data.nilai >= 70 ? 'Tuntas' : 'Remedi'}</span></td>
+                    <td>
+                        <button class="delete-btn" onclick="hapusData(${data.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Update mobile statistics
+        function updateStatistikMobile() {
+            const totalSiswa = dataNilai.length;
+            
+            if (totalSiswa === 0) {
+                document.getElementById('totalSiswaMobile').textContent = '0';
+                document.getElementById('rataRataMobile').textContent = '0';
+                document.getElementById('nilaiTertinggiMobile').textContent = '0';
+                document.getElementById('nilaiTerendahMobile').textContent = '0';
+                return;
+            }
+            
+            const nilaiArray = dataNilai.map(data => data.nilai);
+            const rataRata = Math.round(nilaiArray.reduce((a, b) => a + b, 0) / totalSiswa);
+            const nilaiTertinggi = Math.max(...nilaiArray);
+            const nilaiTerendah = Math.min(...nilaiArray);
+            
+            document.getElementById('totalSiswaMobile').textContent = totalSiswa;
+            document.getElementById('rataRataMobile').textContent = rataRata;
+            document.getElementById('nilaiTertinggiMobile').textContent = nilaiTertinggi;
+            document.getElementById('nilaiTerendahMobile').textContent = nilaiTerendah;
+        }
+        
+        // Inisialisasi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            tampilkanData();
+            updateStatistik();
+            tampilkanDataMobile();
+            updateStatistikMobile();
+            updateSubtitle();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98473c43f59f4095',t:'MTc1ODc2ODg1MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
