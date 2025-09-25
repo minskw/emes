@@ -547,7 +547,15 @@
                         
                         <div class="form-group">
                             <label for="kelas">Kelas</label>
-                            <input type="text" id="kelas" required placeholder="Contoh: XII IPA 1">
+                            <select id="kelas" required>
+                                <option value="">Pilih kelas...</option>
+                                <option value="4A">4A</option>
+                                <option value="4B">4B</option>
+                                <option value="5A">5A</option>
+                                <option value="5B">5B</option>
+                                <option value="6A">6A</option>
+                                <option value="6B">6B</option>
+                            </select>
                         </div>
                         
                         <div class="form-group">
@@ -573,7 +581,9 @@
                         <div class="form-grid">
                             <div class="form-group">
                                 <label for="namaSiswa">Nama Siswa</label>
-                                <input type="text" id="namaSiswa" required placeholder="Masukkan nama siswa">
+                                <select id="namaSiswa" required>
+                                    <option value="">Pilih nama siswa...</option>
+                                </select>
                             </div>
                             
                             <div class="form-group">
@@ -673,7 +683,15 @@
                             
                             <div class="form-group">
                                 <label for="kelasMobile">Kelas</label>
-                                <input type="text" id="kelasMobile" required placeholder="Contoh: XII IPA 1">
+                                <select id="kelasMobile" required>
+                                    <option value="">Pilih kelas...</option>
+                                    <option value="4A">4A</option>
+                                    <option value="4B">4B</option>
+                                    <option value="5A">5A</option>
+                                    <option value="5B">5B</option>
+                                    <option value="6A">6A</option>
+                                    <option value="6B">6B</option>
+                                </select>
                             </div>
                             
                             <div class="form-group">
@@ -701,7 +719,9 @@
                             <div class="form-grid">
                                 <div class="form-group">
                                     <label for="namaSiswaMobile">Nama Siswa</label>
-                                    <input type="text" id="namaSiswaMobile" required placeholder="Masukkan nama siswa">
+                                    <select id="namaSiswaMobile" required>
+                                        <option value="">Pilih nama siswa...</option>
+                                    </select>
                                 </div>
                                 
                                 <div class="form-group">
@@ -818,6 +838,62 @@
     <script>
         let dataNilai = JSON.parse(localStorage.getItem('dataNilai')) || [];
         
+        // Database siswa berdasarkan kelas
+        const databaseSiswa = {
+            '4A': [
+                'ABDUL HAMID SYAMIL', 'AFRA AMALIA', 'AHMAD AL GHIFARI PUTRA', 'AHMAD HAYDAR ALI', 'APRILIA',
+                'AQILA NAFIZA PRASETIO', 'BADRUT TAMAM', 'DEA AULIA TIKA', 'DEVI KURNIAWATI', 'FAJAR RAMANDIKA',
+                'FIKRI', 'JIHAN AQILA', 'KHALIFAH AQILA MYSHA TRI', 'KHOIRUL UMAM', 'LULU\' MAMLU\'AH',
+                'LUTFIA APRILLIA', 'MOHAMMAD ARIF', 'MOHAMMAD IBRAHIM MUFID', 'MUHAMMAD ANAN AKBAR', 'MUHAMMAD AZIZ ALFIQRI',
+                'MUHAMMAD HAYDAR ALI', 'MUHAMMAD IZAM', 'MUHAMMAD KHOIRUL AKBAR', 'MUHAMMAD MUBAROK', 'MUHAMMAD REIHAN ALZAIDAN',
+                'MUHAMMAD SYAFI\'UL ANAM', 'NADA FAJRIA SALSABILA', 'NAZRIL ILHAM', 'NUR AWALIA RAMADANI', 'PUTRI AISA',
+                'RASEL ANDRIANI', 'TAUFIQURRAHMAN', 'ZAHIRATUL QHOMARIYAH', 'ZAKI MUBAROK', 'ZAKIA PUTRI'
+            ],
+            '4B': [
+                'ABDULLOH', 'ALFI SIDDIQIYAH', 'ALIN ALFIANSYAH SAMUDRA', 'CHAYRA PRAJA NADHIFA', 'FATHAN ARZIQI',
+                'FEBRIAN', 'HAFIZA', 'JULIANTO', 'LAILA HUMAYROH', 'MAWADDATUN NAFISAH',
+                'MOHAMMAD ARIF A\'LA', 'MUHAMMAD ATIF ASLAM', 'MUHAMMAD ILHAM MAULANA', 'MUHAMMAD KHOLIS IMAN', 'MUHAMMAD RIZQY AL-FATIH',
+                'MUHAMMAD ROYHAN', 'MUHAMMAD WA\'ILU AR-RAHMAN', 'MUHAMMAD ZACKY AL FARIZY', 'MUZAYYENAH MUKAROMAH', 'NAILA FUTRI',
+                'NAILA PUTRI', 'NURUL KOMARIAH', 'PUTRI YANA', 'RAISHA BILQIS AZZAHIRA', 'RICCO MAHENDRA',
+                'RIZKI JAHWAN AL-IMAN', 'SALSABILA', 'SYIFA MULYANI', 'THALITA AGNIA RAVIVA', 'USMAN ZAINI',
+                'ZAINUL ILHAM', 'ZIFA SITI AZZAHRA'
+            ],
+            '5A': [
+                'ADIBA DWI ASILA', 'ADIBA DWI SAKILA', 'ADIVA AHMED', 'AGUNG RENATA', 'ASKAR NUFAIL',
+                'DAFFA JIHAD FISABILILLAH', 'DAVA PRATAMA', 'FADIL', 'FAIZATUN NI\'MAH', 'FAREL FIRMANSYAH',
+                'FATIMAH AZ-ZAHRA', 'HAFIZAM', 'ISMATUL ROHILAH', 'MAURA FEBRIA', 'MIA ANGGRAINI',
+                'MUHAMMAD DEMIYAN', 'MUHAMMAD HASAN AL MALIKI', 'MUHAMMAD KHOIRUL AZAM', 'MUHAMMAD NABIL', 'MUHAMMAD WAHYU SAPUTRA',
+                'MULTAZAM', 'NOVI AMALIA', 'NURIDZATI EL MUBARAK', 'OCTAVIANI', 'PUTRI ANJANI',
+                'PUTRI FIANI', 'RENALDO PRASETYO', 'RISKI ROMADHON', 'SAKINAH', 'SHAFIRA TAUFIQRY',
+                'ULFATUL BARIYAH', 'ZAINUL ARIF'
+            ],
+            '5B': [
+                'AHMAD YUSRIL', 'AISYAH ZAHRA', 'AKILATUL MURNI', 'ALIA MAYSARA', 'ALIYA FITRIA',
+                'ALVIANSYAH', 'ANGGA ARIF PUTRA', 'ANGGI SHILVIA PUTRI', 'ASHILAH', 'ASYFA',
+                'AZIQUR\'ROHMAN ASARY', 'AZKYA RAMADHANI', 'BUDI SETIAWAN', 'HAFIFAH RAMADHANI', 'ILHAM',
+                'LAILATUL ADEWIYEH', 'LAILATUL RAMADANIA', 'LUTFI ABDILLAH', 'MUHAMMAD ADAM AIMAN', 'MUHAMMAD FAHROZI',
+                'MUHAMMAD HASANUDIN', 'MUHAMMAD RIZAL', 'MUHAMMAD ZAINUL ARIFIN', 'NABILA OKTAVIA', 'NAURA SYIFA AZZURA',
+                'NIKMATUL KHOIRIYAH', 'NURUL NAJWA', 'RAFA ASKA PUTRA', 'RAFFI MAULANA', 'RAKHA DESMINANDO',
+                'RATI ANDINI', 'WAEL HASAN'
+            ],
+            '6A': [
+                'ABDUL ROHMAN', 'AKTARADI TOMI ASDIRI', 'AL FATIR', 'ALMER BAHRAIN ABIYU', 'ANGGITA ANDIANA',
+                'DAFA', 'FAHMY RAMADHAN', 'FAIZAL ARIFIN', 'FATIMATUZZAHRO', 'IBNU QOYYIM AL-JAUZIYYAH',
+                'JAFIKA NEYLA', 'LULU QOMARIYAH', 'MIFTAHUL RIZKY ROMADHON', 'MUHAMMAD ALI AKBAR', 'MUHAMMAD AZIDAN',
+                'MUHAMMAD FAUZY', 'MUHAMMAD HAIKAL FIKRI', 'MUHAMMAD HASIM AS\'ARI', 'MUHSIN AL FARISI', 'MUSYASSAROH',
+                'NOVA OKTAVIANI', 'NURUL HIDAYAH', 'QUEISHA ANYA AZZAHRA', 'ROHANI', 'SAHRU RAMADAN',
+                'SAIFULLOH', 'SANIA ALFA SAKINAH', 'SITY KHOTIJEH', 'ZACKIYATUL MAR ATI', 'ZAHROTUL MAR ATI'
+            ],
+            '6B': [
+                'AHMAD DANIEL', 'AHMAD FIKI', 'AHMAD JEFRI', 'ALI ZAINAL ABIDIN', 'ARIANSYAH PUTRA ARMI',
+                'AROHMAN HIDAYAH', 'AURELIA NAFIZA', 'AYU ANDRIANI', 'BAGUS CAHYO PRAKOSO', 'BILQIS AULIA AZKA',
+                'BUDI NURYANTO', 'FAISHOL MAULANA', 'FARIS IBRA', 'FINA HASANATUL AMALIA', 'HAFIS',
+                'MUHAMMAD HABIBI', 'MUHAMMAD IKBAL', 'MUHAMMAD KHOIRON', 'MUHAMMAD RIFA\'I', 'MUHAMMAD ROIHAN',
+                'MUHAMMAD ZAHRUL', 'NAILA ULFA', 'NURUL HUSYEN', 'PUTRI AYU', 'PUTRI LAILATU SYARIFAH',
+                'RIZAL SAIFUDDIN', 'SALVAWATI', 'SITI UNAISAH', 'YUDI ANSYAH'
+            ]
+        };
+        
         // Hitung nilai berdasarkan skor
         function hitungNilai(skorSiswa, skorMax) {
             return Math.round((skorSiswa / skorMax) * 100);
@@ -864,6 +940,27 @@
             }
         }
         
+        // Update daftar siswa berdasarkan kelas
+        function updateDaftarSiswa() {
+            const kelas = document.getElementById('kelas').value.trim();
+            const namaSiswaSelect = document.getElementById('namaSiswa');
+            const namaSiswaMobileSelect = document.getElementById('namaSiswaMobile');
+            
+            // Reset dropdown
+            namaSiswaSelect.innerHTML = '<option value="">Pilih nama siswa...</option>';
+            namaSiswaMobileSelect.innerHTML = '<option value="">Pilih nama siswa...</option>';
+            
+            if (kelas && databaseSiswa[kelas]) {
+                const siswaList = databaseSiswa[kelas];
+                siswaList.forEach(nama => {
+                    const option = new Option(nama, nama);
+                    const optionMobile = new Option(nama, nama);
+                    namaSiswaSelect.add(option);
+                    namaSiswaMobileSelect.add(optionMobile);
+                });
+            }
+        }
+        
         // Update subtitle dinamis
         function updateSubtitle() {
             const namaUjian = document.getElementById('namaUjian').value.trim();
@@ -877,6 +974,9 @@
             } else {
                 subtitle.textContent = 'Kelola dan hitung nilai siswa dengan mudah';
             }
+            
+            // Update daftar siswa ketika kelas berubah
+            updateDaftarSiswa();
         }
         
         // Event listeners untuk update real-time
@@ -955,6 +1055,7 @@
             
             // Reset hanya field nama siswa dan skor
             document.getElementById('namaSiswa').value = '';
+            document.getElementById('namaSiswaMobile').value = '';
             document.getElementById('skorSiswa').value = '';
             updateNilaiDisplay();
             
@@ -1349,26 +1450,49 @@
         // Add event listeners for form sync
         document.addEventListener('DOMContentLoaded', function() {
             // Desktop form sync
-            ['namaUjian', 'mataPelajaran', 'kelas', 'skorMax'].forEach(id => {
+            ['namaUjian', 'mataPelajaran', 'skorMax'].forEach(id => {
                 document.getElementById(id).addEventListener('input', function() {
                     document.getElementById(id + 'Mobile').value = this.value;
                 });
             });
             
+            // Kelas dropdown sync (change event instead of input)
+            document.getElementById('kelas').addEventListener('change', function() {
+                document.getElementById('kelasMobile').value = this.value;
+                updateSubtitle();
+                updateDaftarSiswa();
+            });
+            
             // Mobile form sync
-            ['namaUjianMobile', 'mataPelajaranMobile', 'kelasMobile', 'skorMaxMobile'].forEach(id => {
+            ['namaUjianMobile', 'mataPelajaranMobile', 'skorMaxMobile'].forEach(id => {
                 document.getElementById(id).addEventListener('input', function() {
                     const desktopId = id.replace('Mobile', '');
                     document.getElementById(desktopId).value = this.value;
-                    if (id === 'namaUjianMobile' || id === 'kelasMobile') {
+                    if (id === 'namaUjianMobile') {
                         updateSubtitle();
                     }
                 });
             });
             
+            // Mobile kelas dropdown sync
+            document.getElementById('kelasMobile').addEventListener('change', function() {
+                document.getElementById('kelas').value = this.value;
+                updateSubtitle();
+                updateDaftarSiswa();
+            });
+            
             // Mobile input form sync
             document.getElementById('skorMaxMobile').addEventListener('input', updateNilaiDisplayMobile);
             document.getElementById('skorSiswaMobile').addEventListener('input', updateNilaiDisplayMobile);
+            
+            // Sync nama siswa dropdown
+            document.getElementById('namaSiswa').addEventListener('change', function() {
+                document.getElementById('namaSiswaMobile').value = this.value;
+            });
+            
+            document.getElementById('namaSiswaMobile').addEventListener('change', function() {
+                document.getElementById('namaSiswa').value = this.value;
+            });
         });
         
         // Update mobile nilai display
@@ -1476,6 +1600,7 @@
             
             // Reset hanya field nama siswa dan skor
             document.getElementById('namaSiswaMobile').value = '';
+            document.getElementById('namaSiswa').value = '';
             document.getElementById('skorSiswaMobile').value = '';
             updateNilaiDisplayMobile();
             
@@ -1553,5 +1678,5 @@
             updateSubtitle();
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9847e6b1065b40f0',t:'MTc1ODc3NTgzMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'984800e037825f65',t:'MTc1ODc3NjkwNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
