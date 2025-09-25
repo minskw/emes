@@ -104,11 +104,9 @@
         .nilai-display {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
-            padding: 15px 20px;
+            padding: 20px;
             border-radius: 10px;
             text-align: center;
-            font-size: 1.5rem;
-            font-weight: 700;
             margin: 10px 0;
         }
         
@@ -234,7 +232,59 @@
         
         .nilai-a { background: #dcfce7; color: #166534; }
         .nilai-b { background: #dbeafe; color: #1e40af; }
-        .nilai-c { background: #fef3c7; color: #92400e; }
+        .nilai-c { 
+            background: #fef3c7 !important; 
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+            text-shadow: none !important;
+            filter: none !important;
+            opacity: 1 !important;
+        }
+        .nilai-c * { 
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+            text-shadow: none !important;
+            filter: none !important;
+            opacity: 1 !important;
+        }
+        span.nilai-c { 
+            background: #fef3c7 !important;
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+            text-shadow: none !important;
+            filter: none !important;
+            opacity: 1 !important;
+            -webkit-font-smoothing: antialiased !important;
+            -moz-osx-font-smoothing: grayscale !important;
+        }
+        .nilai-badge.nilai-c {
+            background: #fef3c7 !important; 
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+            text-shadow: none !important;
+            filter: none !important;
+            opacity: 1 !important;
+            -webkit-font-smoothing: antialiased !important;
+            -moz-osx-font-smoothing: grayscale !important;
+        }
+        
+        /* Extra aggressive rules for preview environments */
+        [class*="nilai-c"] {
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+        }
+        
+        /* Force black text in any container that might have Grade C */
+        .data-table .nilai-c,
+        .data-table span.nilai-c,
+        table .nilai-c,
+        table span.nilai-c {
+            background: #fef3c7 !important;
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+            text-shadow: none !important;
+            filter: none !important;
+        }
         .nilai-d { background: #fee2e2; color: #991b1b; }
         
         .delete-btn {
@@ -490,7 +540,8 @@
                         </div>
                         
                         <div class="nilai-display" id="nilaiDisplay">
-                            Nilai: -
+                            <div style="font-size: 1rem; margin-bottom: 5px; opacity: 0.8;">NILAI</div>
+                            <div style="font-size: 3rem; font-weight: 900; line-height: 1;">-</div>
                         </div>
                         
                         <button type="submit" class="btn btn-primary">
@@ -616,7 +667,8 @@
                             </div>
                             
                             <div class="nilai-display" id="nilaiDisplayMobile">
-                                Nilai: -
+                                <div style="font-size: 1rem; margin-bottom: 5px; opacity: 0.8;">NILAI</div>
+                                <div style="font-size: 3rem; font-weight: 900; line-height: 1;">-</div>
                             </div>
                             
                             <button type="submit" class="btn btn-primary">
@@ -742,9 +794,27 @@
             if (skorMax && skorSiswa) {
                 const nilai = hitungNilai(parseInt(skorSiswa), parseInt(skorMax));
                 const grade = tentukanGrade(nilai);
-                nilaiDisplay.textContent = `Nilai: ${nilai} (Grade ${grade})`;
+                nilaiDisplay.innerHTML = `
+                    <div style="font-size: 1rem; margin-bottom: 5px; opacity: 0.8;">NILAI</div>
+                    <div style="font-size: 3rem; font-weight: 900; line-height: 1;">${nilai}</div>
+                `;
+                
+                // Ubah warna berdasarkan grade
+                if (grade === 'A') {
+                    nilaiDisplay.style.background = 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'; // Biru
+                } else if (grade === 'B') {
+                    nilaiDisplay.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)'; // Hijau
+                } else if (grade === 'C') {
+                    nilaiDisplay.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'; // Kuning
+                } else if (grade === 'D') {
+                    nilaiDisplay.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'; // Merah
+                }
             } else {
-                nilaiDisplay.textContent = 'Nilai: -';
+                nilaiDisplay.innerHTML = `
+                    <div style="font-size: 1rem; margin-bottom: 5px; opacity: 0.8;">NILAI</div>
+                    <div style="font-size: 3rem; font-weight: 900; line-height: 1;">-</div>
+                `;
+                nilaiDisplay.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)'; // Default hijau
             }
         }
         
@@ -950,7 +1020,24 @@
                         .stat-number { font-size: 1.5rem; font-weight: bold; color: #4f46e5; }
                         .nilai-a { background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 10px; }
                         .nilai-b { background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 10px; }
-                        .nilai-c { background: #fef3c7; color: #92400e; padding: 4px 8px; border-radius: 10px; }
+                        .nilai-c { 
+                            background: #fef3c7 !important; 
+                            color: #000000 !important; 
+                            padding: 4px 8px; 
+                            border-radius: 10px;
+                            -webkit-text-fill-color: #000000 !important;
+                            text-shadow: none !important;
+                        }
+                        .nilai-c * { 
+                            color: #000000 !important;
+                            -webkit-text-fill-color: #000000 !important;
+                            text-shadow: none !important;
+                        }
+                        span.nilai-c { 
+                            color: #000000 !important;
+                            -webkit-text-fill-color: #000000 !important;
+                            text-shadow: none !important;
+                        }
                         .nilai-d { background: #fee2e2; color: #991b1b; padding: 4px 8px; border-radius: 10px; }
                         @media print {
                             body { margin: 0; }
@@ -1166,9 +1253,27 @@
             if (skorMax && skorSiswa) {
                 const nilai = hitungNilai(parseInt(skorSiswa), parseInt(skorMax));
                 const grade = tentukanGrade(nilai);
-                nilaiDisplay.textContent = `Nilai: ${nilai} (Grade ${grade})`;
+                nilaiDisplay.innerHTML = `
+                    <div style="font-size: 1rem; margin-bottom: 5px; opacity: 0.8;">NILAI</div>
+                    <div style="font-size: 3rem; font-weight: 900; line-height: 1;">${nilai}</div>
+                `;
+                
+                // Ubah warna berdasarkan grade
+                if (grade === 'A') {
+                    nilaiDisplay.style.background = 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'; // Biru
+                } else if (grade === 'B') {
+                    nilaiDisplay.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)'; // Hijau
+                } else if (grade === 'C') {
+                    nilaiDisplay.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'; // Kuning
+                } else if (grade === 'D') {
+                    nilaiDisplay.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'; // Merah
+                }
             } else {
-                nilaiDisplay.textContent = 'Nilai: -';
+                nilaiDisplay.innerHTML = `
+                    <div style="font-size: 1rem; margin-bottom: 5px; opacity: 0.8;">NILAI</div>
+                    <div style="font-size: 3rem; font-weight: 900; line-height: 1;">-</div>
+                `;
+                nilaiDisplay.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)'; // Default hijau
             }
         }
         
@@ -1299,5 +1404,5 @@
             updateSubtitle();
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98473c43f59f4095',t:'MTc1ODc2ODg1MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'984785c65639ce46',t:'MTc1ODc3MTg2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
