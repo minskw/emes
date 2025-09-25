@@ -414,9 +414,43 @@
             display: none;
         }
 
+        .footer {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .footer p {
+            margin: 0;
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .footer strong {
+            color: #60a5fa;
+            font-weight: 700;
+        }
+
         @media (max-width: 768px) {
             body {
                 padding-bottom: 80px;
+            }
+            
+            .footer {
+                margin-top: 20px;
+                padding: 15px 0;
+            }
+            
+            .footer p {
+                font-size: 0.9rem;
             }
             
             .desktop-view {
@@ -751,6 +785,13 @@
             </div>
         </div>
 
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-content">
+                <p>💡 Ide kreatif: <strong>MAHFUD SIDIK</strong></p>
+            </div>
+        </div>
+
         <!-- Mobile Navigation -->
         <div class="mobile-nav">
             <div class="mobile-nav-container">
@@ -784,9 +825,9 @@
         
         // Tentukan grade berdasarkan nilai
         function tentukanGrade(nilai) {
-            if (nilai >= 85) return 'A';
-            if (nilai >= 70) return 'B';
-            if (nilai >= 60) return 'C';
+            if (nilai >= 90) return 'A';
+            if (nilai >= 80) return 'B';
+            if (nilai >= 70) return 'C';
             return 'D';
         }
         
@@ -1075,10 +1116,12 @@
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>Data Nilai Siswa</title>
+                    <title>${dataNilai[0]?.namaUjian || 'Data Nilai Siswa'} - ${dataNilai[0]?.kelas || ''}</title>
                     <style>
                         body { font-family: Arial, sans-serif; margin: 20px; }
                         .header { text-align: center; margin-bottom: 30px; }
+                        .header h1 { margin: 0 0 10px 0; color: #4f46e5; }
+                        .header h2 { margin: 0 0 15px 0; color: #64748b; font-weight: normal; }
                         .info { margin-bottom: 20px; }
                         table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
                         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
@@ -1115,7 +1158,8 @@
                 </head>
                 <body>
                     <div class="header">
-                        <h1>📊 Data Nilai Siswa</h1>
+                        <h1>📊 ${dataNilai[0]?.namaUjian || 'Data Nilai Siswa'}</h1>
+                        <h2>${dataNilai[0]?.mataPelajaran || ''} - ${dataNilai[0]?.kelas || ''}</h2>
                         <p>Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')}</p>
                     </div>
                     
@@ -1509,5 +1553,5 @@
             updateSubtitle();
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98479a6994dcfda7',t:'MTc1ODc3MjcwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9847d189804e4060',t:'MTc1ODc3NDk2NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
