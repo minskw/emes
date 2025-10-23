@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Pencatatan Pembayaran Siswa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+        
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .print-area, .print-area * {
+                visibility: visible;
+            }
+            .print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-header {
+                text-align: center;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #000;
+                padding-bottom: 10px;
+            }
+            .print-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 12px;
+            }
+            .print-table th, .print-table td {
+                border: 1px solid #000;
+                padding: 6px 4px;
+                text-align: left;
+            }
+            .print-table th {
+                background-color: #f0f0f0;
+                font-weight: bold;
+                font-size: 11px;
+            }
+            @media print and (max-width: 600px) {
+                .print-table {
+                    font-size: 10px;
+                }
+                .print-table th, .print-table td {
+                    padding: 4px 2px;
+                }
+                .print-header h1 {
+                    font-size: 18px !important;
+                }
+            }
+        }
+        
+        /* Touch-friendly buttons */
+        @media (max-width: 768px) {
+            button {
+                min-height: 44px;
+                touch-action: manipulation;
+            }
+        }
+    </style>
+</head>
+<body class="h-full bg-gradient-to-br from-blue-50 to-indigo-100 font-sans">
+    <div class="min-h-full p-2 sm:p-4">
+        <header class="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-4 sm:mb-6">
+            <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 text-center">
+                <i class="fas fa-clipboard-list text-blue-600 mr-2"></i>
+                Aplikasi Pembayaran Paket LJK
+            </h1>
+            <p class="text-sm sm:text-base text-gray-600 text-center mt-2">Kelola pembayaran paket LJK siswa kelas 5A, 5B, 6A, dan 6B</p>
+        </header>
+
+        <main class="max-w-7xl mx-auto">
+            <!-- Filter dan Statistik -->
+            <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-4 sm:mb-6">
+                <!-- Filter Section -->
+                <div class="space-y-4 mb-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div>
+                            <label for="kelasFilter" class="block text-sm font-medium text-gray-700 mb-1">Filter Kelas:</label>
+                            <select id="kelasFilter" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Semua Kelas</option>
+                                <option value="5A">5A</option>
+                                <option value="5B">5B</option>
+                                <option value="6A">6A</option>
+                                <option value="6B">6B</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="statusFilter" class="block text-sm font-medium text-gray-700 mb-1">Filter Status:</label>
+                            <select id="statusFilter" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Semua Status</option>
+                                <option value="lunas">Lunas</option>
+                                <option value="belum">Belum Bayar</option>
+                            </select>
+                        </div>
+                        <div class="sm:col-span-2 lg:col-span-1">
+                            <label for="searchInput" class="block text-sm font-medium text-gray-700 mb-1">Cari Nama:</label>
+                            <input type="text" id="searchInput" placeholder="Ketik nama siswa..." class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:flex gap-2">
+                        <button id="printBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 text-sm">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                        <button id="exportBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 text-sm">
+                            <i class="fas fa-file-excel"></i> Export Excel
+                        </button>
+                        <button id="resetBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 text-sm">
+                            <i class="fas fa-undo"></i> Reset Filter
+                        </button>
+                        <button id="bulkPayBtn" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 text-sm col-span-2 sm:col-span-1">
+                            <i class="fas fa-users-cog"></i> Aksi Massal
+                        </button>
+                        <button id="quickStatsBtn" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2 text-sm col-span-2 sm:col-span-2 lg:col-span-1">
+                            <i class="fas fa-chart-bar"></i> Statistik Detail
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Statistik -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                    <div class="bg-blue-50 p-3 sm:p-4 rounded-lg">
+                        <div class="flex items-center justify-between mb-1">
+                            <i class="fas fa-users text-blue-500 text-lg"></i>
+                            <div class="text-xl sm:text-2xl font-bold text-blue-600" id="totalSiswa">0</div>
+                        </div>
+                        <div class="text-xs sm:text-sm text-gray-600">Total Siswa</div>
+                    </div>
+                    <div class="bg-green-50 p-3 sm:p-4 rounded-lg">
+                        <div class="flex items-center justify-between mb-1">
+                            <i class="fas fa-check-circle text-green-500 text-lg"></i>
+                            <div class="text-xl sm:text-2xl font-bold text-green-600" id="sudahBayar">0</div>
+                        </div>
+                        <div class="text-xs sm:text-sm text-gray-600">Sudah Bayar</div>
+                    </div>
+                    <div class="bg-red-50 p-3 sm:p-4 rounded-lg">
+                        <div class="flex items-center justify-between mb-1">
+                            <i class="fas fa-times-circle text-red-500 text-lg"></i>
+                            <div class="text-xl sm:text-2xl font-bold text-red-600" id="belumBayar">0</div>
+                        </div>
+                        <div class="text-xs sm:text-sm text-gray-600">Belum Bayar</div>
+                    </div>
+                    <div class="bg-purple-50 p-3 sm:p-4 rounded-lg">
+                        <div class="flex items-center justify-between mb-1">
+                            <i class="fas fa-chart-pie text-purple-500 text-lg"></i>
+                            <div class="text-xl sm:text-2xl font-bold text-purple-600" id="persentase">0%</div>
+                        </div>
+                        <div class="text-xs sm:text-sm text-gray-600">Persentase Lunas</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Card View (visible on small screens) -->
+            <div id="mobileView" class="block lg:hidden space-y-3">
+                <!-- Cards will be populated by JavaScript -->
+            </div>
+
+            <!-- Desktop Table View (hidden on small screens) -->
+            <div class="hidden lg:block bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="p-6 border-b border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-800">Daftar Siswa dan Status Pembayaran</h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <input type="checkbox" id="selectAll" class="rounded">
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Siswa</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kelas</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status Pembayaran</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Bayar</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="siswaTableBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Data akan diisi oleh JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+        </main>
+
+        <!-- Area Print (tersembunyi) -->
+        <div id="printArea" class="print-area" style="display: none;">
+            <div class="print-header">
+                <h1 style="font-size: 24px; margin: 0;">Aplikasi Pembayaran Paket LJK</h1>
+                <p style="margin: 5px 0;">Laporan Pembayaran Paket LJK</p>
+                <p id="printDate" style="margin: 5px 0; font-size: 14px;"></p>
+                <div id="printStats" style="margin: 10px 0; font-size: 14px;"></div>
+            </div>
+            <table id="printTable" class="print-table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Siswa</th>
+                        <th>Kelas</th>
+                        <th>Status Pembayaran</th>
+                        <th>Tanggal Bayar</th>
+                    </tr>
+                </thead>
+                <tbody id="printTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Data siswa
+        const dataSiswa = [
+            // Kelas 5A
+            { nama: "ADIBA DWI ASILA", kelas: "5A" },
+            { nama: "ADIBA DWI SAKILA", kelas: "5A" },
+            { nama: "ADIVA AHMED", kelas: "5A" },
+            { nama: "AGUNG RENATA", kelas: "5A" },
+            { nama: "ASKAR NUFAIL", kelas: "5A" },
+            { nama: "DAFFA JIHAD FISABILILLAH", kelas: "5A" },
+            { nama: "DAVA PRATAMA", kelas: "5A" },
+            { nama: "FADIL", kelas: "5A" },
+            { nama: "FAIZATUN NI'MAH", kelas: "5A" },
+            { nama: "FAREL FIRMANSYAH", kelas: "5A" },
+            { nama: "FATIMAH AZ-ZAHRA", kelas: "5A" },
+            { nama: "HAFIZAM", kelas: "5A" },
+            { nama: "ISMATUL ROHILAH", kelas: "5A" },
+            { nama: "MAURA FEBRIA", kelas: "5A" },
+            { nama: "MIA ANGGRAINI", kelas: "5A" },
+            { nama: "MUHAMMAD DEMIYAN", kelas: "5A" },
+            { nama: "MUHAMMAD HASAN AL MALIKI", kelas: "5A" },
+            { nama: "MUHAMMAD KHOIRUL AZAM", kelas: "5A" },
+            { nama: "MUHAMMAD NABIL", kelas: "5A" },
+            { nama: "MUHAMMAD WAHYU SAPUTRA", kelas: "5A" },
+            { nama: "MULTAZAM", kelas: "5A" },
+            { nama: "NOVI AMALIA", kelas: "5A" },
+            { nama: "NURIDZATI EL MUBARAK", kelas: "5A" },
+            { nama: "OCTAVIANI", kelas: "5A" },
+            { nama: "PUTRI ANJANI", kelas: "5A" },
+            { nama: "PUTRI FIANI", kelas: "5A" },
+            { nama: "RENALDO PRASETYO", kelas: "5A" },
+            { nama: "RISKI ROMADHON", kelas: "5A" },
+            { nama: "SAKINAH", kelas: "5A" },
+            { nama: "SHAFIRA TAUFIQRY", kelas: "5A" },
+            { nama: "ULFATUL BARIYAH", kelas: "5A" },
+            { nama: "ZAINUL ARIF", kelas: "5A" },
+            // Kelas 5B
+            { nama: "AHMAD YUSRIL", kelas: "5B" },
+            { nama: "AISYAH ZAHRA", kelas: "5B" },
+            { nama: "AKILATUL MURNI", kelas: "5B" },
+            { nama: "ALIA MAYSARA", kelas: "5B" },
+            { nama: "ALIYA FITRIA", kelas: "5B" },
+            { nama: "ALVIANSYAH", kelas: "5B" },
+            { nama: "ANGGA ARIF PUTRA", kelas: "5B" },
+            { nama: "ANGGI SHILVIA PUTRI", kelas: "5B" },
+            { nama: "ASHILAH", kelas: "5B" },
+            { nama: "ASYFA", kelas: "5B" },
+            { nama: "AZIQUR'ROHMAN ASARY", kelas: "5B" },
+            { nama: "AZKYA RAMADHANI", kelas: "5B" },
+            { nama: "BUDI SETIAWAN", kelas: "5B" },
+            { nama: "HAFIFAH RAMADHANI", kelas: "5B" },
+            { nama: "ILHAM", kelas: "5B" },
+            { nama: "LAILATUL ADEWIYEH", kelas: "5B" },
+            { nama: "LAILATUL RAMADANIA", kelas: "5B" },
+            { nama: "LUTFI ABDILLAH", kelas: "5B" },
+            { nama: "MUHAMMAD ADAM AIMAN", kelas: "5B" },
+            { nama: "MUHAMMAD FAHROZI", kelas: "5B" },
+            { nama: "MUHAMMAD HASANUDIN", kelas: "5B" },
+            { nama: "MUHAMMAD RIZAL", kelas: "5B" },
+            { nama: "MUHAMMAD ZAINUL ARIFIN", kelas: "5B" },
+            { nama: "NABILA OKTAVIA", kelas: "5B" },
+            { nama: "NAURA SYIFA AZZURA", kelas: "5B" },
+            { nama: "NIKMATUL KHOIRIYAH", kelas: "5B" },
+            { nama: "NURUL NAJWA", kelas: "5B" },
+            { nama: "RAFA ASKA PUTRA", kelas: "5B" },
+            { nama: "RAFFI MAULANA", kelas: "5B" },
+            { nama: "RAKHA DESMINANDO", kelas: "5B" },
+            { nama: "RATI ANDINI", kelas: "5B" },
+            { nama: "WAEL HASAN", kelas: "5B" },
+            // Kelas 6A
+            { nama: "ABDUL ROHMAN", kelas: "6A" },
+            { nama: "AKTARADI TOMI ASDIRI", kelas: "6A" },
+            { nama: "AL FATIR", kelas: "6A" },
+            { nama: "ALMER BAHRAIN ABIYU", kelas: "6A" },
+            { nama: "ANGGITA ANDIANA", kelas: "6A" },
+            { nama: "DAFA", kelas: "6A" },
+            { nama: "FAHMY RAMADHAN", kelas: "6A" },
+            { nama: "FAIZAL ARIFIN", kelas: "6A" },
+            { nama: "FATIMATUZZAHRO", kelas: "6A" },
+            { nama: "IBNU QOYYIM AL-JAUZIYYAH", kelas: "6A" },
+            { nama: "JAFIKA NEYLA", kelas: "6A" },
+            { nama: "LULU QOMARIYAH", kelas: "6A" },
+            { nama: "MIFTAHUL RIZKY ROMADHON", kelas: "6A" },
+            { nama: "MUHAMMAD ALI AKBAR", kelas: "6A" },
+            { nama: "MUHAMMAD AZIDAN", kelas: "6A" },
+            { nama: "MUHAMMAD FAUZY", kelas: "6A" },
+            { nama: "MUHAMMAD HAIKAL FIKRI", kelas: "6A" },
+            { nama: "MUHAMMAD HASIM AS'ARI", kelas: "6A" },
+            { nama: "MUHSIN AL FARISI", kelas: "6A" },
+            { nama: "MUSYASSAROH", kelas: "6A" },
+            { nama: "NOVA OKTAVIANI", kelas: "6A" },
+            { nama: "NURUL HIDAYAH", kelas: "6A" },
+            { nama: "QUEISHA ANYA AZZAHRA", kelas: "6A" },
+            { nama: "ROHANI", kelas: "6A" },
+            { nama: "SAHRU RAMADAN", kelas: "6A" },
+            { nama: "SAIFULLOH", kelas: "6A" },
+            { nama: "SANIA ALFA SAKINAH", kelas: "6A" },
+            { nama: "SITY KHOTIJEH", kelas: "6A" },
+            { nama: "ZACKIYATUL MAR ATI", kelas: "6A" },
+            { nama: "ZAHROTUL MAR ATI", kelas: "6A" },
+            // Kelas 6B
+            { nama: "AHMAD DANIEL", kelas: "6B" },
+            { nama: "AHMAD FIKI", kelas: "6B" },
+            { nama: "AHMAD JEFRI", kelas: "6B" },
+            { nama: "ALI ZAINAL ABIDIN", kelas: "6B" },
+            { nama: "ARIANSYAH PUTRA ARMI", kelas: "6B" },
+            { nama: "AROHMAN HIDAYAH", kelas: "6B" },
+            { nama: "AURELIA NAFIZA", kelas: "6B" },
+            { nama: "AYU ANDRIANI", kelas: "6B" },
+            { nama: "BAGUS CAHYO PRAKOSO", kelas: "6B" },
+            { nama: "BILQIS AULIA AZKA", kelas: "6B" },
+            { nama: "BUDI NURYANTO", kelas: "6B" },
+            { nama: "FAISHOL MAULANA", kelas: "6B" },
+            { nama: "FARIS IBRA", kelas: "6B" },
+            { nama: "FINA HASANATUL AMALIA", kelas: "6B" },
+            { nama: "HAFIS", kelas: "6B" },
+            { nama: "MUHAMMAD HABIBI", kelas: "6B" },
+            { nama: "MUHAMMAD IKBAL", kelas: "6B" },
+            { nama: "MUHAMMAD KHOIRON", kelas: "6B" },
+            { nama: "MUHAMMAD RIFA'I", kelas: "6B" },
+            { nama: "MUHAMMAD ROIHAN", kelas: "6B" },
+            { nama: "MUHAMMAD ZAHRUL", kelas: "6B" },
+            { nama: "NAILA ULFA", kelas: "6B" },
+            { nama: "NURUL HUSYEN", kelas: "6B" },
+            { nama: "PUTRI AYU", kelas: "6B" },
+            { nama: "PUTRI LAILATU SYARIFAH", kelas: "6B" },
+            { nama: "RIZAL SAIFUDDIN", kelas: "6B" },
+            { nama: "SALVAWATI", kelas: "6B" },
+            { nama: "SITI UNAISAH", kelas: "6B" },
+            { nama: "YUDI ANSYAH", kelas: "6B" }
+        ];
+
+        // Inisialisasi data pembayaran
+        let pembayaranData = {};
+        dataSiswa.forEach((siswa, index) => {
+            const key = `${siswa.nama}_${siswa.kelas}`;
+            pembayaranData[key] = {
+                id: index + 1,
+                nama: siswa.nama,
+                kelas: siswa.kelas,
+                status: 'belum',
+                tanggalBayar: null
+            };
+        });
+
+        // Load data dari localStorage jika ada
+        const savedData = localStorage.getItem('pembayaranSiswa');
+        if (savedData) {
+            pembayaranData = JSON.parse(savedData);
+        }
+
+        // Elemen DOM
+        const kelasFilter = document.getElementById('kelasFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const searchInput = document.getElementById('searchInput');
+        const resetBtn = document.getElementById('resetBtn');
+        const printBtn = document.getElementById('printBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const bulkPayBtn = document.getElementById('bulkPayBtn');
+        const quickStatsBtn = document.getElementById('quickStatsBtn');
+        const selectAllCheckbox = document.getElementById('selectAll');
+        const siswaTableBody = document.getElementById('siswaTableBody');
+        const mobileView = document.getElementById('mobileView');
+
+        const printArea = document.getElementById('printArea');
+        const printTableBody = document.getElementById('printTableBody');
+        const printDate = document.getElementById('printDate');
+        const printStats = document.getElementById('printStats');
+
+        let currentAction = null;
+
+        // Fungsi untuk menyimpan data ke localStorage
+        function saveData() {
+            localStorage.setItem('pembayaranSiswa', JSON.stringify(pembayaranData));
+        }
+
+        // Fungsi untuk memformat tanggal
+        function formatTanggal(date) {
+            if (!date) return '-';
+            return new Date(date).toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+        // Fungsi untuk update statistik
+        function updateStatistik(filteredData) {
+            const total = filteredData.length;
+            const lunas = filteredData.filter(siswa => siswa.status === 'lunas').length;
+            const belum = total - lunas;
+            const persentase = total > 0 ? Math.round((lunas / total) * 100) : 0;
+
+            document.getElementById('totalSiswa').textContent = total;
+            document.getElementById('sudahBayar').textContent = lunas;
+            document.getElementById('belumBayar').textContent = belum;
+            document.getElementById('persentase').textContent = persentase + '%';
+        }
+
+        // Fungsi untuk render mobile cards
+        function renderMobileCards(filteredData) {
+            mobileView.innerHTML = '';
+            filteredData.forEach((siswa, index) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow-md p-4 border-l-4 ' + 
+                    (siswa.status === 'lunas' ? 'border-green-500' : 'border-red-500');
+                
+                const statusBadge = siswa.status === 'lunas' 
+                    ? '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"><i class="fas fa-check-circle mr-1"></i> Lunas</span>'
+                    : '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"><i class="fas fa-times-circle mr-1"></i> Belum Bayar</span>';
+
+                const actionButton = siswa.status === 'lunas'
+                    ? `<button onclick="ubahStatus('${siswa.nama}', '${siswa.kelas}', 'belum')" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm transition-colors"><i class="fas fa-undo mr-2"></i>Batalkan</button>`
+                    : `<button onclick="ubahStatus('${siswa.nama}', '${siswa.kelas}', 'lunas')" class="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm transition-colors"><i class="fas fa-check mr-2"></i>Bayar</button>`;
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-start gap-3 flex-1">
+                            <input type="checkbox" class="student-checkbox mt-1" data-nama="${siswa.nama}" data-kelas="${siswa.kelas}" data-status="${siswa.status}">
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-900 text-sm">${siswa.nama}</h3>
+                                <p class="text-gray-600 text-sm">Kelas ${siswa.kelas}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-gray-500 mb-1">No. ${index + 1}</div>
+                            ${statusBadge}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="text-xs text-gray-500">Tanggal Bayar:</div>
+                        <div class="text-sm text-gray-700">${formatTanggal(siswa.tanggalBayar)}</div>
+                    </div>
+                    <div class="flex gap-2">
+                        ${actionButton}
+                        <button onclick="showStudentDetail('${siswa.nama}', '${siswa.kelas}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-sm transition-colors">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
+                    </div>
+                `;
+                mobileView.appendChild(card);
+            });
+        }
+
+        // Fungsi untuk render tabel desktop
+        function renderDesktopTable(filteredData) {
+            siswaTableBody.innerHTML = '';
+            filteredData.forEach((siswa, index) => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                
+                const statusBadge = siswa.status === 'lunas' 
+                    ? '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><i class="fas fa-check-circle mr-1"></i> Lunas</span>'
+                    : '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"><i class="fas fa-times-circle mr-1"></i> Belum Bayar</span>';
+
+                const actionButton = siswa.status === 'lunas'
+                    ? `<button onclick="ubahStatus('${siswa.nama}', '${siswa.kelas}', 'belum')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-colors mr-2"><i class="fas fa-undo mr-1"></i>Batalkan</button>`
+                    : `<button onclick="ubahStatus('${siswa.nama}', '${siswa.kelas}', 'lunas')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors mr-2"><i class="fas fa-check mr-1"></i>Bayar</button>`;
+
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <input type="checkbox" class="student-checkbox rounded" data-nama="${siswa.nama}" data-kelas="${siswa.kelas}" data-status="${siswa.status}">
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${index + 1}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${siswa.nama}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${siswa.kelas}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${statusBadge}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formatTanggal(siswa.tanggalBayar)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        ${actionButton}
+                        <button onclick="showStudentDetail('${siswa.nama}', '${siswa.kelas}')" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-sm transition-colors">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
+                    </td>
+                `;
+                siswaTableBody.appendChild(row);
+            });
+        }
+
+        // Fungsi untuk render semua tampilan
+        function renderTabel() {
+            const filteredData = getFilteredData();
+
+            // Update statistik
+            updateStatistik(filteredData);
+
+            // Render mobile cards dan desktop table
+            renderMobileCards(filteredData);
+            renderDesktopTable(filteredData);
+        }
+
+        // Fungsi untuk mendapatkan data yang difilter
+        function getFilteredData() {
+            const kelasValue = kelasFilter.value;
+            const statusValue = statusFilter.value;
+            const searchValue = searchInput.value.toLowerCase();
+
+            let filteredData = Object.values(pembayaranData);
+
+            if (kelasValue) {
+                filteredData = filteredData.filter(siswa => siswa.kelas === kelasValue);
+            }
+
+            if (statusValue) {
+                filteredData = filteredData.filter(siswa => siswa.status === statusValue);
+            }
+
+            if (searchValue) {
+                filteredData = filteredData.filter(siswa => 
+                    siswa.nama.toLowerCase().includes(searchValue)
+                );
+            }
+
+            return filteredData;
+        }
+
+        // Fungsi untuk print
+        function printData() {
+            const filteredData = getFilteredData();
+            
+            if (filteredData.length === 0) {
+                Swal.fire({
+                    title: 'Tidak Ada Data',
+                    text: 'Tidak ada data untuk dicetak. Silakan periksa filter Anda.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+            
+            // Update tanggal print
+            const now = new Date();
+            printDate.textContent = `Dicetak pada: ${now.toLocaleDateString('id-ID', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            })} ${now.toLocaleTimeString('id-ID')}`;
+
+            // Update statistik print
+            const total = filteredData.length;
+            const lunas = filteredData.filter(siswa => siswa.status === 'lunas').length;
+            const belum = total - lunas;
+            const persentase = total > 0 ? Math.round((lunas / total) * 100) : 0;
+            
+            printStats.innerHTML = `
+                <strong>Statistik:</strong> 
+                Total: ${total} siswa | 
+                Sudah Bayar: ${lunas} siswa | 
+                Belum Bayar: ${belum} siswa | 
+                Persentase Lunas: ${persentase}%
+            `;
+
+            // Isi tabel print
+            printTableBody.innerHTML = '';
+            filteredData.forEach((siswa, index) => {
+                const row = document.createElement('tr');
+                const statusText = siswa.status === 'lunas' ? 'Lunas' : 'Belum Bayar';
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${siswa.nama}</td>
+                    <td>${siswa.kelas}</td>
+                    <td>${statusText}</td>
+                    <td>${formatTanggal(siswa.tanggalBayar)}</td>
+                `;
+                printTableBody.appendChild(row);
+            });
+
+            // Print
+            window.print();
+            
+            // Show success message after print dialog
+            setTimeout(() => {
+                Swal.fire({
+                    title: 'Siap Dicetak!',
+                    text: `Laporan ${total} siswa siap dicetak.`,
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }, 500);
+        }
+
+        // Fungsi untuk export Excel
+        function exportToExcel() {
+            const filteredData = getFilteredData();
+            
+            if (filteredData.length === 0) {
+                Swal.fire({
+                    title: 'Tidak Ada Data',
+                    text: 'Tidak ada data untuk diekspor. Silakan periksa filter Anda.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+            
+            // Show loading
+            Swal.fire({
+                title: 'Memproses...',
+                text: 'Sedang membuat file Excel',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            // Siapkan data untuk Excel
+            const excelData = [
+                ['No', 'Nama Siswa', 'Kelas', 'Status Pembayaran', 'Tanggal Bayar']
+            ];
+
+            filteredData.forEach((siswa, index) => {
+                const statusText = siswa.status === 'lunas' ? 'Lunas' : 'Belum Bayar';
+                excelData.push([
+                    index + 1,
+                    siswa.nama,
+                    siswa.kelas,
+                    statusText,
+                    formatTanggal(siswa.tanggalBayar)
+                ]);
+            });
+
+            // Tambahkan statistik di akhir
+            const total = filteredData.length;
+            const lunas = filteredData.filter(siswa => siswa.status === 'lunas').length;
+            const belum = total - lunas;
+            const persentase = total > 0 ? Math.round((lunas / total) * 100) : 0;
+
+            excelData.push([]);
+            excelData.push(['STATISTIK']);
+            excelData.push(['Total Siswa', total]);
+            excelData.push(['Sudah Bayar', lunas]);
+            excelData.push(['Belum Bayar', belum]);
+            excelData.push(['Persentase Lunas', persentase + '%']);
+
+            // Buat workbook dan worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(excelData);
+
+            // Styling untuk header
+            const range = XLSX.utils.decode_range(ws['!ref']);
+            for (let C = range.s.c; C <= range.e.c; ++C) {
+                const address = XLSX.utils.encode_cell({ r: 0, c: C });
+                if (!ws[address]) continue;
+                ws[address].s = {
+                    font: { bold: true },
+                    fill: { fgColor: { rgb: "EEEEEE" } }
+                };
+            }
+
+            // Set lebar kolom
+            ws['!cols'] = [
+                { wch: 5 },   // No
+                { wch: 30 },  // Nama
+                { wch: 8 },   // Kelas
+                { wch: 15 },  // Status
+                { wch: 12 }   // Tanggal
+            ];
+
+            // Tambahkan worksheet ke workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'Pembayaran LJK');
+
+            // Generate nama file dengan tanggal
+            const now = new Date();
+            const fileName = `Pembayaran_LJK_${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}.xlsx`;
+
+            // Download file
+            setTimeout(() => {
+                XLSX.writeFile(wb, fileName);
+                
+                Swal.fire({
+                    title: 'Berhasil!',
+                    text: `File Excel "${fileName}" berhasil diunduh dengan ${total} data siswa.`,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+            }, 1000);
+        }
+
+        // Fungsi untuk menampilkan detail siswa
+        function showStudentDetail(nama, kelas) {
+            const key = `${nama}_${kelas}`;
+            const siswa = pembayaranData[key];
+            
+            const statusText = siswa.status === 'lunas' ? 'Sudah Lunas' : 'Belum Bayar';
+            const statusIcon = siswa.status === 'lunas' ? 'fas fa-check-circle text-green-500' : 'fas fa-times-circle text-red-500';
+            
+            Swal.fire({
+                title: `<i class="fas fa-user-graduate"></i> Detail Siswa`,
+                html: `
+                    <div class="text-left space-y-3">
+                        <div class="bg-gray-50 p-3 rounded">
+                            <strong>Nama:</strong> ${nama}
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded">
+                            <strong>Kelas:</strong> ${kelas}
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded">
+                            <strong>Status:</strong> 
+                            <span class="ml-2"><i class="${statusIcon}"></i> ${statusText}</span>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded">
+                            <strong>Tanggal Bayar:</strong> ${formatTanggal(siswa.tanggalBayar)}
+                        </div>
+                    </div>
+                `,
+                showConfirmButton: true,
+                confirmButtonText: '<i class="fas fa-times"></i> Tutup',
+                width: '400px'
+            });
+        }
+
+        // Fungsi untuk aksi massal
+        function bulkAction() {
+            const checkedBoxes = document.querySelectorAll('.student-checkbox:checked');
+            
+            if (checkedBoxes.length === 0) {
+                Swal.fire({
+                    title: 'Tidak Ada Siswa Dipilih',
+                    text: 'Silakan pilih siswa terlebih dahulu untuk melakukan aksi massal.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            const selectedStudents = Array.from(checkedBoxes).map(cb => ({
+                nama: cb.dataset.nama,
+                kelas: cb.dataset.kelas,
+                status: cb.dataset.status
+            }));
+
+            const unpaidCount = selectedStudents.filter(s => s.status === 'belum').length;
+            const paidCount = selectedStudents.filter(s => s.status === 'lunas').length;
+
+            Swal.fire({
+                title: 'Aksi Massal',
+                html: `
+                    <div class="text-left mb-4">
+                        <p><strong>${selectedStudents.length}</strong> siswa dipilih:</p>
+                        <p>• <span class="text-red-600">${unpaidCount}</span> belum bayar</p>
+                        <p>• <span class="text-green-600">${paidCount}</span> sudah bayar</p>
+                    </div>
+                    <div class="space-y-2">
+                        <button id="bulkMarkPaid" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">
+                            <i class="fas fa-check-circle mr-2"></i>Tandai Semua Sudah Bayar (${unpaidCount})
+                        </button>
+                        <button id="bulkMarkUnpaid" class="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">
+                            <i class="fas fa-times-circle mr-2"></i>Tandai Semua Belum Bayar (${paidCount})
+                        </button>
+                    </div>
+                `,
+                showConfirmButton: false,
+                showCancelButton: true,
+                cancelButtonText: '<i class="fas fa-times"></i> Batal',
+                didOpen: () => {
+                    document.getElementById('bulkMarkPaid').onclick = () => {
+                        bulkUpdateStatus(selectedStudents, 'lunas');
+                        Swal.close();
+                    };
+                    document.getElementById('bulkMarkUnpaid').onclick = () => {
+                        bulkUpdateStatus(selectedStudents, 'belum');
+                        Swal.close();
+                    };
+                }
+            });
+        }
+
+        // Fungsi untuk update status massal
+        function bulkUpdateStatus(students, newStatus) {
+            const targetStudents = students.filter(s => s.status !== newStatus);
+            
+            if (targetStudents.length === 0) {
+                Swal.fire({
+                    title: 'Tidak Ada Perubahan',
+                    text: `Semua siswa yang dipilih sudah memiliki status "${newStatus === 'lunas' ? 'Lunas' : 'Belum Bayar'}".`,
+                    icon: 'info',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            const actionText = newStatus === 'lunas' ? 'menandai sebagai sudah bayar' : 'membatalkan pembayaran';
+            
+            Swal.fire({
+                title: 'Konfirmasi Aksi Massal',
+                text: `Apakah Anda yakin ingin ${actionText} untuk ${targetStudents.length} siswa?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: newStatus === 'lunas' ? '#10b981' : '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: `<i class="fas fa-check mr-2"></i>Ya, ${actionText}`,
+                cancelButtonText: '<i class="fas fa-times mr-2"></i>Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    targetStudents.forEach(student => {
+                        const key = `${student.nama}_${student.kelas}`;
+                        pembayaranData[key].status = newStatus;
+                        pembayaranData[key].tanggalBayar = newStatus === 'lunas' ? new Date().toISOString() : null;
+                    });
+                    
+                    saveData();
+                    renderTabel();
+                    
+                    // Clear all checkboxes
+                    document.querySelectorAll('.student-checkbox').forEach(cb => cb.checked = false);
+                    if (selectAllCheckbox) selectAllCheckbox.checked = false;
+                    
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: `${targetStudents.length} siswa berhasil diperbarui.`,
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        }
+
+        // Fungsi untuk statistik detail
+        function showDetailedStats() {
+            const allData = Object.values(pembayaranData);
+            const filteredData = getFilteredData();
+            
+            // Statistik per kelas
+            const statsByClass = {};
+            ['5A', '5B', '6A', '6B'].forEach(kelas => {
+                const kelasData = allData.filter(s => s.kelas === kelas);
+                const kelasPaid = kelasData.filter(s => s.status === 'lunas').length;
+                statsByClass[kelas] = {
+                    total: kelasData.length,
+                    paid: kelasPaid,
+                    unpaid: kelasData.length - kelasPaid,
+                    percentage: kelasData.length > 0 ? Math.round((kelasPaid / kelasData.length) * 100) : 0
+                };
+            });
+
+            const totalAll = allData.length;
+            const paidAll = allData.filter(s => s.status === 'lunas').length;
+            const unpaidAll = totalAll - paidAll;
+            const percentageAll = totalAll > 0 ? Math.round((paidAll / totalAll) * 100) : 0;
+
+            Swal.fire({
+                title: '<i class="fas fa-chart-bar"></i> Statistik Detail Pembayaran',
+                html: `
+                    <div class="text-left space-y-4">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h3 class="font-bold text-blue-800 mb-2">📊 Statistik Keseluruhan</h3>
+                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                <div>Total Siswa: <strong>${totalAll}</strong></div>
+                                <div>Sudah Bayar: <strong class="text-green-600">${paidAll}</strong></div>
+                                <div>Belum Bayar: <strong class="text-red-600">${unpaidAll}</strong></div>
+                                <div>Persentase: <strong class="text-blue-600">${percentageAll}%</strong></div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h3 class="font-bold text-gray-800 mb-3">📋 Statistik Per Kelas</h3>
+                            <div class="space-y-2">
+                                ${Object.entries(statsByClass).map(([kelas, stats]) => `
+                                    <div class="bg-white p-3 rounded border">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <strong>Kelas ${kelas}</strong>
+                                            <span class="text-sm font-medium ${stats.percentage >= 80 ? 'text-green-600' : stats.percentage >= 50 ? 'text-yellow-600' : 'text-red-600'}">${stats.percentage}%</span>
+                                        </div>
+                                        <div class="text-xs text-gray-600">
+                                            ${stats.paid}/${stats.total} siswa • 
+                                            <span class="text-green-600">${stats.paid} lunas</span> • 
+                                            <span class="text-red-600">${stats.unpaid} belum</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                            <div class="bg-green-500 h-2 rounded-full" style="width: ${stats.percentage}%"></div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        ${filteredData.length !== totalAll ? `
+                            <div class="bg-yellow-50 p-4 rounded-lg">
+                                <h3 class="font-bold text-yellow-800 mb-2">🔍 Data Terfilter Saat Ini</h3>
+                                <div class="text-sm text-yellow-700">
+                                    Menampilkan ${filteredData.length} dari ${totalAll} siswa
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `,
+                width: '600px',
+                confirmButtonText: '<i class="fas fa-times"></i> Tutup'
+            });
+        }
+
+        // Fungsi untuk select all checkbox
+        function handleSelectAll() {
+            const checkboxes = document.querySelectorAll('.student-checkbox');
+            const isChecked = selectAllCheckbox.checked;
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+        }
+
+        // Fungsi untuk mengubah status pembayaran
+        function ubahStatus(nama, kelas, statusBaru) {
+            const key = `${nama}_${kelas}`;
+            const siswa = pembayaranData[key];
+            
+            if (statusBaru === 'lunas') {
+                Swal.fire({
+                    title: 'Konfirmasi Pembayaran',
+                    text: `Apakah Anda yakin ${nama} (${kelas}) sudah melakukan pembayaran?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#10b981',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: '<i class="fas fa-check mr-2"></i>Ya, Sudah Bayar',
+                    cancelButtonText: '<i class="fas fa-times mr-2"></i>Batal',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        siswa.status = statusBaru;
+                        siswa.tanggalBayar = new Date().toISOString();
+                        saveData();
+                        renderTabel();
+                        
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: `Pembayaran ${nama} telah dicatat.`,
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            } else {
+                Swal.fire({
+                    title: 'Batalkan Pembayaran',
+                    text: `Apakah Anda yakin ingin membatalkan pembayaran ${nama} (${kelas})?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: '<i class="fas fa-undo mr-2"></i>Ya, Batalkan',
+                    cancelButtonText: '<i class="fas fa-times mr-2"></i>Batal',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        siswa.status = statusBaru;
+                        siswa.tanggalBayar = null;
+                        saveData();
+                        renderTabel();
+                        
+                        Swal.fire({
+                            title: 'Dibatalkan!',
+                            text: `Pembayaran ${nama} telah dibatalkan.`,
+                            icon: 'info',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            }
+        }
+
+
+
+        // Event listeners
+        kelasFilter.addEventListener('change', renderTabel);
+        statusFilter.addEventListener('change', renderTabel);
+        searchInput.addEventListener('input', renderTabel);
+
+        resetBtn.addEventListener('click', () => {
+            kelasFilter.value = '';
+            statusFilter.value = '';
+            searchInput.value = '';
+            renderTabel();
+        });
+
+        printBtn.addEventListener('click', printData);
+        exportBtn.addEventListener('click', exportToExcel);
+        bulkPayBtn.addEventListener('click', bulkAction);
+        quickStatsBtn.addEventListener('click', showDetailedStats);
+        
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', handleSelectAll);
+        }
+
+        // Event listener untuk checkbox individual
+        document.addEventListener('change', (e) => {
+            if (e.target.classList.contains('student-checkbox')) {
+                const allCheckboxes = document.querySelectorAll('.student-checkbox');
+                const checkedCheckboxes = document.querySelectorAll('.student-checkbox:checked');
+                
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.checked = allCheckboxes.length === checkedCheckboxes.length;
+                    selectAllCheckbox.indeterminate = checkedCheckboxes.length > 0 && checkedCheckboxes.length < allCheckboxes.length;
+                }
+            }
+        });
+
+        // Inisialisasi aplikasi
+        renderTabel();
+
+        // Expose fungsi ke global scope untuk onclick handlers
+        window.ubahStatus = ubahStatus;
+        window.showStudentDetail = showStudentDetail;
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'993509d0732345e2',t:'MTc2MTI2MjM5NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
