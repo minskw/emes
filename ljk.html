@@ -987,7 +987,7 @@
                 return {
                     nama: cb.dataset.nama,
                     kelas: cb.dataset.kelas,
-                    status: siswa ? siswa.status : cb.dataset.status
+                    status: siswa ? siswa.status : 'belum'
                 };
             });
 
@@ -996,7 +996,21 @@
 
             Swal.fire({
                 title: 'Aksi Massal',
-                html: '<div class="text-left mb-4"><p><strong>' + selectedStudents.length + '</strong> siswa dipilih:</p><p>• <span class="text-red-600">' + unpaidCount + '</span> belum bayar</p><p>• <span class="text-green-600">' + paidCount + '</span> sudah bayar</p></div><div class="space-y-2"><button id="bulkMarkPaid" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded ' + (unpaidCount === 0 ? 'opacity-50 cursor-not-allowed' : '') + '"><i class="fas fa-check-circle mr-2"></i>Tandai Semua Sudah Bayar (' + unpaidCount + ')</button><button id="bulkMarkUnpaid" class="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded ' + (paidCount === 0 ? 'opacity-50 cursor-not-allowed' : '') + '"><i class="fas fa-times-circle mr-2"></i>Tandai Semua Belum Bayar (' + paidCount + ')</button></div>',
+                html: `
+                    <div class="text-left mb-4">
+                        <p><strong>${selectedStudents.length}</strong> siswa dipilih:</p>
+                        <p>• <span class="text-red-600">${unpaidCount}</span> belum bayar</p>
+                        <p>• <span class="text-green-600">${paidCount}</span> sudah bayar</p>
+                    </div>
+                    <div class="space-y-2">
+                        <button id="bulkMarkPaid" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded ${unpaidCount === 0 ? 'opacity-50 cursor-not-allowed' : ''}" ${unpaidCount === 0 ? 'disabled' : ''}>
+                            <i class="fas fa-check-circle mr-2"></i>Tandai Semua Sudah Bayar (${unpaidCount})
+                        </button>
+                        <button id="bulkMarkUnpaid" class="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded ${paidCount === 0 ? 'opacity-50 cursor-not-allowed' : ''}" ${paidCount === 0 ? 'disabled' : ''}>
+                            <i class="fas fa-times-circle mr-2"></i>Tandai Semua Belum Bayar (${paidCount})
+                        </button>
+                    </div>
+                `,
                 showConfirmButton: false,
                 showCancelButton: true,
                 cancelButtonText: '<i class="fas fa-times"></i> Batal',
@@ -1004,36 +1018,18 @@
                     const paidBtn = document.getElementById('bulkMarkPaid');
                     const unpaidBtn = document.getElementById('bulkMarkUnpaid');
                     
-                    if (unpaidCount > 0) {
-                        paidBtn.onclick = () => {
-                            bulkUpdateStatus(selectedStudents, 'lunas');
+                    if (paidBtn && unpaidCount > 0) {
+                        paidBtn.addEventListener('click', () => {
                             Swal.close();
-                        };
-                    } else {
-                        paidBtn.onclick = () => {
-                            Swal.fire({
-                                title: 'Tidak Ada Aksi',
-                                text: 'Semua siswa yang dipilih sudah dalam status "Sudah Bayar".',
-                                icon: 'info',
-                                confirmButtonText: 'OK'
-                            });
-                        };
+                            bulkUpdateStatus(selectedStudents, 'lunas');
+                        });
                     }
                     
-                    if (paidCount > 0) {
-                        unpaidBtn.onclick = () => {
-                            bulkUpdateStatus(selectedStudents, 'belum');
+                    if (unpaidBtn && paidCount > 0) {
+                        unpaidBtn.addEventListener('click', () => {
                             Swal.close();
-                        };
-                    } else {
-                        unpaidBtn.onclick = () => {
-                            Swal.fire({
-                                title: 'Tidak Ada Aksi',
-                                text: 'Semua siswa yang dipilih sudah dalam status "Belum Bayar".',
-                                icon: 'info',
-                                confirmButtonText: 'OK'
-                            });
-                        };
+                            bulkUpdateStatus(selectedStudents, 'belum');
+                        });
                     }
                 }
             });
@@ -1264,5 +1260,5 @@
         window.ubahStatus = ubahStatus;
         window.showStudentDetail = showStudentDetail;
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9949e8e5b4333d92',t:'MTc2MTQ4MTI0OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'994a2d8f9314fd79',t:'MTc2MTQ4NDA2MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
