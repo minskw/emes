@@ -757,8 +757,8 @@
                                     window.close();
                                 }, 1000);
                             };
-                        </script>
-                    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9949bd93a744ce82',t:'MTc2MTQ3OTQ3My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+                        <\/script>
+                    </body>
                     </html>
                 `);
                 
@@ -768,15 +768,7 @@
                 setTimeout(() => {
                     Swal.fire({
                         title: 'Siap Dicetak!',
-                        html: `
-                            <div class="text-center">
-                                <i class="fas fa-print text-blue-500 text-4xl mb-3"></i>
-                                <p>Dokumen PDF siap dicetak!</p>
-                                <p class="text-sm text-gray-600 mt-2">
-                                    ${total} data siswa telah disiapkan untuk print
-                                </p>
-                            </div>
-                        `,
+                        html: '<div class="text-center"><i class="fas fa-print text-blue-500 text-4xl mb-3"></i><p>Dokumen PDF siap dicetak!</p><p class="text-sm text-gray-600 mt-2">' + total + ' data siswa telah disiapkan untuk print</p></div>',
                         icon: 'success',
                         confirmButtonText: 'OK'
                     });
@@ -916,16 +908,7 @@
                         
                         Swal.fire({
                             title: 'Berhasil!',
-                            html: `
-                                <div class="text-center">
-                                    <i class="fas fa-file-excel text-green-500 text-4xl mb-3"></i>
-                                    <p>File Excel berhasil diunduh!</p>
-                                    <p class="text-sm text-gray-600 mt-2">
-                                        <strong>${fileName}</strong><br>
-                                        ${total} data siswa telah diekspor
-                                    </p>
-                                </div>
-                            `,
+                            html: '<div class="text-center"><i class="fas fa-file-excel text-green-500 text-4xl mb-3"></i><p>File Excel berhasil diunduh!</p><p class="text-sm text-gray-600 mt-2"><strong>' + fileName + '</strong><br>' + total + ' data siswa telah diekspor</p></div>',
                             icon: 'success',
                             confirmButtonText: 'OK'
                         });
@@ -1013,21 +996,7 @@
 
             Swal.fire({
                 title: 'Aksi Massal',
-                html: `
-                    <div class="text-left mb-4">
-                        <p><strong>${selectedStudents.length}</strong> siswa dipilih:</p>
-                        <p>• <span class="text-red-600">${unpaidCount}</span> belum bayar</p>
-                        <p>• <span class="text-green-600">${paidCount}</span> sudah bayar</p>
-                    </div>
-                    <div class="space-y-2">
-                        <button id="bulkMarkPaid" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded ${unpaidCount === 0 ? 'opacity-50 cursor-not-allowed' : ''}">
-                            <i class="fas fa-check-circle mr-2"></i>Tandai Semua Sudah Bayar (${unpaidCount})
-                        </button>
-                        <button id="bulkMarkUnpaid" class="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded ${paidCount === 0 ? 'opacity-50 cursor-not-allowed' : ''}">
-                            <i class="fas fa-times-circle mr-2"></i>Tandai Semua Belum Bayar (${paidCount})
-                        </button>
-                    </div>
-                `,
+                html: '<div class="text-left mb-4"><p><strong>' + selectedStudents.length + '</strong> siswa dipilih:</p><p>• <span class="text-red-600">' + unpaidCount + '</span> belum bayar</p><p>• <span class="text-green-600">' + paidCount + '</span> sudah bayar</p></div><div class="space-y-2"><button id="bulkMarkPaid" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded ' + (unpaidCount === 0 ? 'opacity-50 cursor-not-allowed' : '') + '"><i class="fas fa-check-circle mr-2"></i>Tandai Semua Sudah Bayar (' + unpaidCount + ')</button><button id="bulkMarkUnpaid" class="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded ' + (paidCount === 0 ? 'opacity-50 cursor-not-allowed' : '') + '"><i class="fas fa-times-circle mr-2"></i>Tandai Semua Belum Bayar (' + paidCount + ')</button></div>',
                 showConfirmButton: false,
                 showCancelButton: true,
                 cancelButtonText: '<i class="fas fa-times"></i> Batal',
@@ -1161,33 +1130,14 @@
                         <div class="bg-gray-50 p-4 rounded-lg">
                             <h3 class="font-bold text-gray-800 mb-3">📋 Statistik Per Kelas</h3>
                             <div class="space-y-2">
-                                ${Object.entries(statsByClass).map(([kelas, stats]) => `
-                                    <div class="bg-white p-3 rounded border">
-                                        <div class="flex justify-between items-center mb-1">
-                                            <strong>Kelas ${kelas}</strong>
-                                            <span class="text-sm font-medium ${stats.percentage >= 80 ? 'text-green-600' : stats.percentage >= 50 ? 'text-yellow-600' : 'text-red-600'}">${stats.percentage}%</span>
-                                        </div>
-                                        <div class="text-xs text-gray-600">
-                                            ${stats.paid}/${stats.total} siswa • 
-                                            <span class="text-green-600">${stats.paid} lunas</span> • 
-                                            <span class="text-red-600">${stats.unpaid} belum</span>
-                                        </div>
-                                        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
-                                            <div class="bg-green-500 h-2 rounded-full" style="width: ${stats.percentage}%"></div>
-                                        </div>
-                                    </div>
-                                `).join('')}
+                                ${Object.entries(statsByClass).map(([kelas, stats]) => {
+                                    const colorClass = stats.percentage >= 80 ? 'text-green-600' : stats.percentage >= 50 ? 'text-yellow-600' : 'text-red-600';
+                                    return '<div class="bg-white p-3 rounded border"><div class="flex justify-between items-center mb-1"><strong>Kelas ' + kelas + '</strong><span class="text-sm font-medium ' + colorClass + '">' + stats.percentage + '%</span></div><div class="text-xs text-gray-600">' + stats.paid + '/' + stats.total + ' siswa • <span class="text-green-600">' + stats.paid + ' lunas</span> • <span class="text-red-600">' + stats.unpaid + ' belum</span></div><div class="w-full bg-gray-200 rounded-full h-2 mt-2"><div class="bg-green-500 h-2 rounded-full" style="width: ' + stats.percentage + '%"></div></div></div>';
+                                }).join('')}
                             </div>
                         </div>
                         
-                        ${filteredData.length !== totalAll ? `
-                            <div class="bg-yellow-50 p-4 rounded-lg">
-                                <h3 class="font-bold text-yellow-800 mb-2">🔍 Data Terfilter Saat Ini</h3>
-                                <div class="text-sm text-yellow-700">
-                                    Menampilkan ${filteredData.length} dari ${totalAll} siswa
-                                </div>
-                            </div>
-                        ` : ''}
+                        ${filteredData.length !== totalAll ? '<div class="bg-yellow-50 p-4 rounded-lg"><h3 class="font-bold text-yellow-800 mb-2">🔍 Data Terfilter Saat Ini</h3><div class="text-sm text-yellow-700">Menampilkan ' + filteredData.length + ' dari ' + totalAll + ' siswa</div></div>' : ''}
                     </div>
                 `,
                 width: '600px',
@@ -1303,12 +1253,16 @@
             }
         });
 
-        // Inisialisasi aplikasi
-        renderTabel();
+        // Inisialisasi aplikasi - tidak menampilkan data secara default
+        // User harus memilih kelas terlebih dahulu
+        // Hanya update statistik dengan data kosong
+        updateStatistik([]);
+        renderMobileCards([]);
+        renderDesktopTable([]);
 
         // Expose fungsi ke global scope untuk onclick handlers
         window.ubahStatus = ubahStatus;
         window.showStudentDetail = showStudentDetail;
     </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9949e8e5b4333d92',t:'MTc2MTQ4MTI0OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
